@@ -1,17 +1,28 @@
-package com.passthebomb.controller;
+package com.passthebomb;
 
-import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Game;
+/*import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.passthebomb.model.*;
+import com.passthebomb.model.Background;
+import com.passthebomb.model.Opponent;
+import com.passthebomb.model.Player;*/
+import com.passthebomb.controller.ScreenManager;
+import com.passthebomb.model.Screen;
 
-public class PassTheBomb implements ApplicationListener {
-	private OrthographicCamera camera;
+//public class PassTheBomb implements ApplicationListener {
+public class PassTheBomb extends Game {
+
+	@Override
+	public void create() {
+		ScreenManager.getInstance().initialize(this);
+		ScreenManager.getInstance().show(Screen.INTRO);
+	}
+/*	private OrthographicCamera camera;
 	private SpriteBatch batch;
 	private Vector3 touchPos;
 	private Background bg;
@@ -34,6 +45,7 @@ public class PassTheBomb implements ApplicationListener {
 
 	@Override
 	public void dispose() {
+		super.dispose();
 		batch.dispose();
 		player1.dispose();
 		player2.dispose();
@@ -86,5 +98,5 @@ public class PassTheBomb implements ApplicationListener {
 
 	@Override
 	public void resume() {
-	}
+	}*/
 }
