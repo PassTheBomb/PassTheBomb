@@ -1,4 +1,4 @@
-package com.passthebomb;
+package com.passthebomb.model;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -45,15 +45,15 @@ public class Background {
 		}
 	}
 	
-	protected void dispose(){
+	public void dispose(){
 		bgImg.dispose();
 	}
 	
-	protected Texture getBackgroundImg(){
+	public Texture getBackgroundImg(){
 		return bgImg;
 	}
 	
-	protected Vector2 getBackgroundPos(){
+	public Vector2 getBackgroundPos(){
 		return bgPos;
 	}
 }

@@ -1,4 +1,4 @@
-package com.me.passthebomb;
+package com.passthebomb.controller;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.passthebomb.model.*;
 
 public class PassTheBomb implements ApplicationListener {
 	private OrthographicCamera camera;

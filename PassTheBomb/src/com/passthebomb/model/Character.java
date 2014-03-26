@@ -1,4 +1,4 @@
-package com.passthebomb;
+package com.passthebomb.model;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
@@ -37,19 +37,19 @@ public abstract class Character {
 		return circle;
 	}
 	
-	protected Texture getCharImg() {
+	public Texture getCharImg() {
 		return circleImg;
 	}
 	
-	protected float getCharImgX(){
+	public float getCharImgX(){
 		return circle.x - RADIUS;
 	}
 
-	protected float getCharImgY(){
+	public float getCharImgY(){
 		return circle.y - RADIUS;
 	}
 	
-	protected void dispose() {
+	public void dispose() {
 		circleImg.dispose();
 	}
 

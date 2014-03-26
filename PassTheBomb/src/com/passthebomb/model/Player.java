@@ -1,4 +1,4 @@
-package com.passthebomb;
+package com.passthebomb.model;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
@@ -28,7 +28,7 @@ public class Player extends Character {
 	}
 
 	@Override
-	protected void update() {
+	public void update() {
 		if(isAlive()){
 			if(isMoving){
 				tgtPosCpy = tgtPos.cpy();
@@ -66,7 +66,7 @@ public class Player extends Character {
 	}
 
 	@Override
-	protected void move(Vector3 tgtPos) {
+	public void move(Vector3 tgtPos) {
 		if (!collide){
 			this.tgtPos = tgtPos;
 			this.isMoving = true;
@@ -75,7 +75,7 @@ public class Player extends Character {
 	}
 
 	@Override
-	protected void collide(Character c) {
+	public void collide(Character c) {
 		Circle thisHitBox = getCharBox();
 		Circle otherHitBox = c.getCharBox();
 		if(thisHitBox.overlaps(otherHitBox)){

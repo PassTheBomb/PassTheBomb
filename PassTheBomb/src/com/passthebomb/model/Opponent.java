@@ -1,4 +1,4 @@
-package com.passthebomb;
+package com.passthebomb.model;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
@@ -13,14 +13,14 @@ public class Opponent extends Character {
 	private int collideCtr = 0;
 	private boolean collide;
 	
-	protected Opponent(Vector2 absStartPos, Texture img, boolean bomb, Background bg) {
+	public Opponent(Vector2 absStartPos, Texture img, boolean bomb, Background bg) {
 		super(absStartPos, img, bomb, bg);
 		tgtPos = new Vector3(absStartPos.x+bg.getBackgroundPos().x, absStartPos.y+bg.getBackgroundPos().y,0);
 		this.collide=false;
 	}
 
 	@Override
-	protected void update() {
+	public void update() {
 		getCharBox().x = getAbsPos().x + getBg().getBackgroundPos().x;
 		getCharBox().y = getAbsPos().y + getBg().getBackgroundPos().y;
 		if(collide){
@@ -60,7 +60,7 @@ public class Opponent extends Character {
 	}
 
 	@Override
-	protected void collide(Character c) {
+	public void collide(Character c) {
 		Circle thisHitBox = getCharBox();
 		Circle otherHitBox = c.getCharBox();
 		if(thisHitBox.overlaps(otherHitBox)){
