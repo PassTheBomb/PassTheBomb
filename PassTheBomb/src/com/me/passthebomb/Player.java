@@ -1,4 +1,4 @@
-package com.passthebomb;
+package com.me.passthebomb;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
@@ -15,14 +15,18 @@ public class Player extends Character {
 	
 	private boolean isMoving;
 	private boolean collide;
+	private boolean bombPassed;
 	
 	private int collideCtr;
+	private int bombPassCtr;
 	
-	public Player(Vector2 absStartPos, Texture img, boolean bomb, Background bg) {
-		super(absStartPos, img, bomb, bg);
+	public Player(Vector2 absStartPos, Texture[] imgSet, boolean bomb, Background bg) {
+		super(absStartPos, imgSet, bomb, bg);
 		isMoving = false;
 		collide = false;
 		collideCtr = 0;
+		bombPassed = false;
+		bombPassCtr = 0;
 		tgtPos = new Vector3(absStartPos.x+bg.getBackgroundPos().x, absStartPos.y+bg.getBackgroundPos().y,0);
 		System.out.println("Playercreation"+getCharBox());
 	}
@@ -31,23 +35,33 @@ public class Player extends Character {
 	protected void update() {
 		if(isAlive()){
 			if(isMoving){
-				tgtPosCpy = tgtPos.cpy();
-				tgtPosCpy.add(new Vector3(-getCharBox().x,-getCharBox().y,0));
-				if (tgtPosCpy.len()> VEL){
-					tgtPosCpy.scl(VEL/tgtPosCpy.len());
-					getCharBox().x += tgtPosCpy.x * DELTA_TIME;
-					getCharBox().y += tgtPosCpy.y * DELTA_TIME;
-					System.out.println("RUN");
-				}
-				else if (tgtPosCpy.len()> 0.1){
-					getCharBox().x += tgtPosCpy.x*DELTA_TIME;
-					getCharBox().y += tgtPosCpy.y*DELTA_TIME;
-					System.out.println("SLOW");
+				if (bombPassed){
+					bombPassCtr++;
+					if (bombPassCtr > 12){
+						bombPassed = false;
+						bombPassCtr = 0;
+					}
 				}
 				else{
-					isMoving = false;
-					System.out.println("STOP");
+					tgtPosCpy = tgtPos.cpy();
+					tgtPosCpy.add(new Vector3(-getCharBox().x,-getCharBox().y,0));
+					if (tgtPosCpy.len()> VEL){
+						tgtPosCpy.scl(VEL/tgtPosCpy.len());
+						getCharBox().x += tgtPosCpy.x * DELTA_TIME;
+						getCharBox().y += tgtPosCpy.y * DELTA_TIME;
+						System.out.println("RUN");
+					}
+					else if (tgtPosCpy.len()> 0.1){
+						getCharBox().x += tgtPosCpy.x*DELTA_TIME;
+						getCharBox().y += tgtPosCpy.y*DELTA_TIME;
+						System.out.println("SLOW");
+					}
+					else{
+						isMoving = false;
+						System.out.println("STOP");
+					}
 				}
+				
 			}
 			if(collide){
 				tgtPosCpy = tgtPos.cpy();
@@ -84,6 +98,12 @@ public class Player extends Character {
 			tgtPos = new Vector3((thisHitBox.x - otherHitBox.x),(thisHitBox.y - otherHitBox.y), 0);
 			tgtPos.scl(VEL/tgtPos.len());
 			collideCtr = 0;
+			if ((c.isCarryingBomb() && !this.isCarryingBomb()) || (!c.isCarryingBomb() && this.isCarryingBomb())){
+				c.changeBombState();
+				this.changeBombState();
+				bombPassed = true;
+				bombPassCtr = 0;
+			}
 		}
 		
 	}

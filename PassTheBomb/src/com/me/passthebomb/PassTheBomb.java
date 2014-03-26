@@ -16,6 +16,8 @@ public class PassTheBomb implements ApplicationListener {
 	private Background bg;
 	private Player player1;
 	private Opponent player2;
+	private Opponent player3;
+	private Opponent player4;
 	
 	@Override
 	public void create() {		
@@ -26,8 +28,22 @@ public class PassTheBomb implements ApplicationListener {
 
 		batch = new SpriteBatch();
 		bg = Background.createBG(new Texture(Gdx.files.internal("background.jpg")), new Vector2(-624,-804));
-		player1 = new Player(new Vector2(774, 1044),new Texture(Gdx.files.internal("circle_r.png")), false, bg);
-		player2 = new Opponent(new Vector2(1274, 1044),new Texture(Gdx.files.internal("circle_r.png")), false, bg);
+		Texture[] player1Texture = new Texture[2];
+		player1Texture[0] = new Texture(Gdx.files.internal("circle_r.png"));
+		player1Texture[1] = new Texture(Gdx.files.internal("circle_r_bomb.png"));	
+		Texture[] player2Texture = new Texture[2];
+		player2Texture[0] = new Texture(Gdx.files.internal("circle_b.png"));
+		player2Texture[1] = new Texture(Gdx.files.internal("circle_b_bomb.png"));	
+		Texture[] player3Texture = new Texture[2];
+		player3Texture[0] = new Texture(Gdx.files.internal("circle_b.png"));
+		player3Texture[1] = new Texture(Gdx.files.internal("circle_b_bomb.png"));	
+		Texture[] player4Texture = new Texture[2];
+		player4Texture[0] = new Texture(Gdx.files.internal("circle_b.png"));
+		player4Texture[1] = new Texture(Gdx.files.internal("circle_b_bomb.png"));
+		player1 = new Player(new Vector2(774, 1044), player1Texture, true, bg);
+		player2 = new Opponent(new Vector2(1274, 1044), player2Texture, false, bg);
+		player3 = new Opponent(new Vector2(1274, 1244), player3Texture, true, bg);
+		player4 = new Opponent(new Vector2(1274, 844), player4Texture, false, bg);
 
 	}
 
@@ -36,6 +52,8 @@ public class PassTheBomb implements ApplicationListener {
 		batch.dispose();
 		player1.dispose();
 		player2.dispose();
+		player3.dispose();
+		player4.dispose();
 		bg.dispose();
 	}
 
@@ -55,6 +73,8 @@ public class PassTheBomb implements ApplicationListener {
 		batch.draw(bg.getBackgroundImg(), bg.getBackgroundPos().x, bg.getBackgroundPos().y);
 		batch.draw(player1.getCharImg(), player1.getCharImgX(), player1.getCharImgY());
 		batch.draw(player2.getCharImg(), player2.getCharImgX(), player2.getCharImgY());
+		batch.draw(player3.getCharImg(), player3.getCharImgX(), player3.getCharImgY());
+		batch.draw(player4.getCharImg(), player4.getCharImgX(), player4.getCharImgY());
 		// end batch. **Note, all image rendering updates should go between
 		// begin and end
 		batch.end();
@@ -69,9 +89,15 @@ public class PassTheBomb implements ApplicationListener {
 			
 		}
 		player1.collide(player2);
+		player1.collide(player3);
+		player1.collide(player4);
 		player2.collide(player1);
+		player3.collide(player1);
+		player4.collide(player1);
 		player1.update();
 		player2.update();
+		player3.update();
+		player4.update();
 	}
 
 

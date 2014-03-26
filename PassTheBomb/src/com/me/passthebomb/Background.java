@@ -1,4 +1,4 @@
-package com.passthebomb;
+package com.me.passthebomb;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;

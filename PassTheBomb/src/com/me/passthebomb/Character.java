@@ -1,4 +1,4 @@
-package com.passthebomb;
+package com.me.passthebomb;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
@@ -10,16 +10,16 @@ public abstract class Character {
 
 	private Vector2 absPos;
 	private Circle circle;
-	private Texture circleImg;
+	private Texture[] circleImgSet;
 	private Background bg;
 	
 	private boolean carryingBomb;
 	private boolean alive;
 	
 	
-	protected Character(Vector2 absStartPos, Texture img, boolean bomb, Background bg) {
+	protected Character(Vector2 absStartPos, Texture[] imgSet, boolean bomb, Background bg) {
 		this.absPos=absStartPos;
-		this.circleImg = img;
+		this.circleImgSet = imgSet;
 		this.carryingBomb = bomb;
 		this.bg = bg;
 		Vector2 temp = new Vector2(this.bg.getBackgroundPos().x,this.bg.getBackgroundPos().y);
@@ -38,7 +38,12 @@ public abstract class Character {
 	}
 	
 	protected Texture getCharImg() {
-		return circleImg;
+		if(carryingBomb){
+			return circleImgSet[1];
+		}
+		else{
+			return circleImgSet[0];
+		}
 	}
 	
 	protected float getCharImgX(){
@@ -50,7 +55,8 @@ public abstract class Character {
 	}
 	
 	protected void dispose() {
-		circleImg.dispose();
+		circleImgSet[0].dispose();
+		circleImgSet[1].dispose();
 	}
 
 	protected Vector2 getAbsPos() {

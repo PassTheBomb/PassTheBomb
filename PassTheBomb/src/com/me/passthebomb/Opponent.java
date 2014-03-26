@@ -1,4 +1,4 @@
-package com.passthebomb;
+package com.me.passthebomb;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
@@ -13,8 +13,8 @@ public class Opponent extends Character {
 	private int collideCtr = 0;
 	private boolean collide;
 	
-	protected Opponent(Vector2 absStartPos, Texture img, boolean bomb, Background bg) {
-		super(absStartPos, img, bomb, bg);
+	protected Opponent(Vector2 absStartPos, Texture[] imgSet, boolean bomb, Background bg) {
+		super(absStartPos, imgSet, bomb, bg);
 		tgtPos = new Vector3(absStartPos.x+bg.getBackgroundPos().x, absStartPos.y+bg.getBackgroundPos().y,0);
 		this.collide=false;
 	}
