@@ -1,8 +1,4 @@
-<<<<<<< HEAD:PassTheBomb/src/com/me/passthebomb/Background.java
-package com.me.passthebomb;
-=======
 package com.passthebomb.view.gui;
->>>>>>> Setup-structure:PassTheBomb/src/com/passthebomb/view/gui/Background.java
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;

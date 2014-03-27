@@ -1,8 +1,4 @@
-<<<<<<< HEAD:PassTheBomb/src/com/me/passthebomb/Player.java
-package com.me.passthebomb;
-=======
 package com.passthebomb.model.local;
->>>>>>> Setup-structure:PassTheBomb/src/com/passthebomb/model/local/Player.java
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;

@@ -1,8 +1,5 @@
-<<<<<<< HEAD:PassTheBomb/src/com/me/passthebomb/Character.java
-package com.me.passthebomb;
-=======
 package com.passthebomb.model.local;
->>>>>>> Setup-structure:PassTheBomb/src/com/passthebomb/model/local/Character.java
+
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
@@ -42,18 +39,13 @@ public abstract class Character {
 		return circle;
 	}
 	
-<<<<<<< HEAD:PassTheBomb/src/com/me/passthebomb/Character.java
-	protected Texture getCharImg() {
+	public Texture getCharImg() {
 		if(carryingBomb){
 			return circleImgSet[1];
 		}
 		else{
 			return circleImgSet[0];
 		}
-=======
-	public Texture getCharImg() {
-		return circleImg;
->>>>>>> Setup-structure:PassTheBomb/src/com/passthebomb/model/local/Character.java
 	}
 	
 	public float getCharImgX(){
@@ -64,14 +56,9 @@ public abstract class Character {
 		return circle.y - RADIUS;
 	}
 	
-<<<<<<< HEAD:PassTheBomb/src/com/me/passthebomb/Character.java
-	protected void dispose() {
+	public void dispose() {
 		circleImgSet[0].dispose();
 		circleImgSet[1].dispose();
-=======
-	public void dispose() {
-		circleImg.dispose();
->>>>>>> Setup-structure:PassTheBomb/src/com/passthebomb/model/local/Character.java
 	}
 
 	protected Vector2 getAbsPos() {
