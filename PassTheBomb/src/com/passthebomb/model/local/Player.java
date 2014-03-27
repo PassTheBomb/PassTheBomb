@@ -1,9 +1,14 @@
+<<<<<<< HEAD:PassTheBomb/src/com/me/passthebomb/Player.java
 package com.me.passthebomb;
+=======
+package com.passthebomb.model.local;
+>>>>>>> Setup-structure:PassTheBomb/src/com/passthebomb/model/local/Player.java
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.passthebomb.view.gui.Background;
 
 public class Player extends Character {
 	private final int VEL = 50;
@@ -32,7 +37,7 @@ public class Player extends Character {
 	}
 
 	@Override
-	protected void update() {
+	public void update() {
 		if(isAlive()){
 			if(isMoving){
 				if (bombPassed){
@@ -80,7 +85,7 @@ public class Player extends Character {
 	}
 
 	@Override
-	protected void move(Vector3 tgtPos) {
+	public void move(Vector3 tgtPos) {
 		if (!collide){
 			this.tgtPos = tgtPos;
 			this.isMoving = true;
@@ -89,7 +94,7 @@ public class Player extends Character {
 	}
 
 	@Override
-	protected void collide(Character c) {
+	public void collide(Character c) {
 		Circle thisHitBox = getCharBox();
 		Circle otherHitBox = c.getCharBox();
 		if(thisHitBox.overlaps(otherHitBox)){

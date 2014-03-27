@@ -1,4 +1,8 @@
+<<<<<<< HEAD:PassTheBomb/src/com/me/passthebomb/Background.java
 package com.me.passthebomb;
+=======
+package com.passthebomb.view.gui;
+>>>>>>> Setup-structure:PassTheBomb/src/com/passthebomb/view/gui/Background.java
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -25,7 +29,7 @@ public class Background {
 		return instance;
 	}
 	
-	protected void scrollX(float val){
+	public void scrollX(float val){
 		bgPos.x += val;
 		if (bgPos.x < RIGHT_LIM){
 			bgPos.x = RIGHT_LIM;
@@ -35,7 +39,7 @@ public class Background {
 		}
 	}
 	
-	protected void scrollY(float val){
+	public void scrollY(float val){
 		bgPos.y += val;
 		if (bgPos.y < TOP_LIM){
 			bgPos.y = TOP_LIM;
@@ -45,15 +49,15 @@ public class Background {
 		}
 	}
 	
-	protected void dispose(){
+	public void dispose(){
 		bgImg.dispose();
 	}
 	
-	protected Texture getBackgroundImg(){
+	public Texture getBackgroundImg(){
 		return bgImg;
 	}
 	
-	protected Vector2 getBackgroundPos(){
+	public Vector2 getBackgroundPos(){
 		return bgPos;
 	}
 }

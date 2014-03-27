@@ -1,23 +1,33 @@
-package com.me.passthebomb;
+package com.passthebomb;
 
-import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Game;
+/*import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.passthebomb.model.Background;
+import com.passthebomb.model.Opponent;
+import com.passthebomb.model.Player;*/
+import com.passthebomb.controller.ScreenManager;
+import com.passthebomb.model.local.Screen;
 
-public class PassTheBomb implements ApplicationListener {
-	private OrthographicCamera camera;
+//public class PassTheBomb implements ApplicationListener {
+public class PassTheBomb extends Game {
+
+	@Override
+	public void create() {
+		ScreenManager.getInstance().initialize(this);
+		ScreenManager.getInstance().show(Screen.INTRO);
+	}
+/*	private OrthographicCamera camera;
 	private SpriteBatch batch;
 	private Vector3 touchPos;
 	private Background bg;
 	private Player player1;
 	private Opponent player2;
-	private Opponent player3;
-	private Opponent player4;
 	
 	@Override
 	public void create() {		
@@ -28,32 +38,17 @@ public class PassTheBomb implements ApplicationListener {
 
 		batch = new SpriteBatch();
 		bg = Background.createBG(new Texture(Gdx.files.internal("background.jpg")), new Vector2(-624,-804));
-		Texture[] player1Texture = new Texture[2];
-		player1Texture[0] = new Texture(Gdx.files.internal("circle_r.png"));
-		player1Texture[1] = new Texture(Gdx.files.internal("circle_r_bomb.png"));	
-		Texture[] player2Texture = new Texture[2];
-		player2Texture[0] = new Texture(Gdx.files.internal("circle_b.png"));
-		player2Texture[1] = new Texture(Gdx.files.internal("circle_b_bomb.png"));	
-		Texture[] player3Texture = new Texture[2];
-		player3Texture[0] = new Texture(Gdx.files.internal("circle_b.png"));
-		player3Texture[1] = new Texture(Gdx.files.internal("circle_b_bomb.png"));	
-		Texture[] player4Texture = new Texture[2];
-		player4Texture[0] = new Texture(Gdx.files.internal("circle_b.png"));
-		player4Texture[1] = new Texture(Gdx.files.internal("circle_b_bomb.png"));
-		player1 = new Player(new Vector2(774, 1044), player1Texture, true, bg);
-		player2 = new Opponent(new Vector2(1274, 1044), player2Texture, false, bg);
-		player3 = new Opponent(new Vector2(1274, 1244), player3Texture, true, bg);
-		player4 = new Opponent(new Vector2(1274, 844), player4Texture, false, bg);
+		player1 = new Player(new Vector2(774, 1044),new Texture(Gdx.files.internal("circle_r.png")), false, bg);
+		player2 = new Opponent(new Vector2(1274, 1044),new Texture(Gdx.files.internal("circle_r.png")), false, bg);
 
 	}
 
 	@Override
 	public void dispose() {
+		super.dispose();
 		batch.dispose();
 		player1.dispose();
 		player2.dispose();
-		player3.dispose();
-		player4.dispose();
 		bg.dispose();
 	}
 
@@ -73,8 +68,6 @@ public class PassTheBomb implements ApplicationListener {
 		batch.draw(bg.getBackgroundImg(), bg.getBackgroundPos().x, bg.getBackgroundPos().y);
 		batch.draw(player1.getCharImg(), player1.getCharImgX(), player1.getCharImgY());
 		batch.draw(player2.getCharImg(), player2.getCharImgX(), player2.getCharImgY());
-		batch.draw(player3.getCharImg(), player3.getCharImgX(), player3.getCharImgY());
-		batch.draw(player4.getCharImg(), player4.getCharImgX(), player4.getCharImgY());
 		// end batch. **Note, all image rendering updates should go between
 		// begin and end
 		batch.end();
@@ -89,15 +82,9 @@ public class PassTheBomb implements ApplicationListener {
 			
 		}
 		player1.collide(player2);
-		player1.collide(player3);
-		player1.collide(player4);
 		player2.collide(player1);
-		player3.collide(player1);
-		player4.collide(player1);
 		player1.update();
 		player2.update();
-		player3.update();
-		player4.update();
 	}
 
 
@@ -111,5 +98,5 @@ public class PassTheBomb implements ApplicationListener {
 
 	@Override
 	public void resume() {
-	}
+	}*/
 }
