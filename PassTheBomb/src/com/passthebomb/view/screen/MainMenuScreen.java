@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.passthebomb.controller.ScreenSwitchHandler;
-import com.passthebomb.model.Screen;
+import com.passthebomb.model.local.Screen;
 import com.passthebomb.view.gui.Button;
 import com.passthebomb.view.gui.Button.ButtonHandler;
 import com.passthebomb.view.gui.Label;

@@ -1,4 +1,4 @@
-package com.passthebomb.model;
+package com.passthebomb.model.local;
 
 import com.passthebomb.view.screen.CreditsScreen;
 import com.passthebomb.view.screen.GameScreen;

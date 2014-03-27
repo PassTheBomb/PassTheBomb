@@ -1,4 +1,4 @@
-package com.passthebomb.model;
+package com.passthebomb.view.gui;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -25,7 +25,7 @@ public class Background {
 		return instance;
 	}
 	
-	protected void scrollX(float val){
+	public void scrollX(float val){
 		bgPos.x += val;
 		if (bgPos.x < RIGHT_LIM){
 			bgPos.x = RIGHT_LIM;
@@ -35,7 +35,7 @@ public class Background {
 		}
 	}
 	
-	protected void scrollY(float val){
+	public void scrollY(float val){
 		bgPos.y += val;
 		if (bgPos.y < TOP_LIM){
 			bgPos.y = TOP_LIM;

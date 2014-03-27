@@ -12,7 +12,7 @@ import com.passthebomb.model.Background;
 import com.passthebomb.model.Opponent;
 import com.passthebomb.model.Player;*/
 import com.passthebomb.controller.ScreenManager;
-import com.passthebomb.model.Screen;
+import com.passthebomb.model.local.Screen;
 
 //public class PassTheBomb implements ApplicationListener {
 public class PassTheBomb extends Game {

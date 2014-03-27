@@ -8,9 +8,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.passthebomb.model.Background;
-import com.passthebomb.model.Opponent;
-import com.passthebomb.model.Player;
+import com.passthebomb.model.local.Opponent;
+import com.passthebomb.model.local.Player;
+import com.passthebomb.view.gui.Background;
 
 public class GameScreen implements Screen {
 	

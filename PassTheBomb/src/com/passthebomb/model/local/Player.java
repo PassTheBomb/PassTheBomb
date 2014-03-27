@@ -1,9 +1,10 @@
-package com.passthebomb.model;
+package com.passthebomb.model.local;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.passthebomb.view.gui.Background;
 
 public class Player extends Character {
 	private final int VEL = 50;

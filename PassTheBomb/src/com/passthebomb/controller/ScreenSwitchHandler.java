@@ -1,6 +1,6 @@
 package com.passthebomb.controller;
 
-import com.passthebomb.model.Screen;
+import com.passthebomb.model.local.Screen;
 import com.passthebomb.view.gui.Button.ButtonHandler;
 
 public class ScreenSwitchHandler implements ButtonHandler{

@@ -1,7 +1,7 @@
 package com.passthebomb.controller;
 
 import com.badlogic.gdx.utils.Timer.Task;
-import com.passthebomb.model.Screen;
+import com.passthebomb.model.local.Screen;
 
 public class ScreenSwitchTask extends Task{
 	

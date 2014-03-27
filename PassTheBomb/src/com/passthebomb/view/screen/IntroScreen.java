@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Timer;
 import com.passthebomb.controller.ScreenManager;
 import com.passthebomb.controller.ScreenSwitchTask;
-import com.passthebomb.model.Screen;
+import com.passthebomb.model.local.Screen;
 
 public class IntroScreen implements com.badlogic.gdx.Screen{
 

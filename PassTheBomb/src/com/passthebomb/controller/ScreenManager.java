@@ -2,7 +2,7 @@ package com.passthebomb.controller;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.IntMap;
-import com.passthebomb.model.Screen;
+import com.passthebomb.model.local.Screen;
 
 public class ScreenManager {
 	
