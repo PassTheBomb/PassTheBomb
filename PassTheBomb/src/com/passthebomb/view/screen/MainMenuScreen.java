@@ -3,60 +3,56 @@ package com.passthebomb.view.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.passthebomb.controller.ScreenSwitchHandler;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.passthebomb.controller.ScreenManager;
 import com.passthebomb.model.local.Screen;
-import com.passthebomb.view.gui.Button;
-import com.passthebomb.view.gui.Button.ButtonHandler;
-import com.passthebomb.view.gui.Label;
 
 public class MainMenuScreen implements com.badlogic.gdx.Screen{
 	
-	private static String HEAD_LABEL = "Pass the Bomb";
-	private static String HOST_BUTTON_LABEL = "Host";
-	private static String JOIN_BUTTON_LABEL = "Join";
-	private static String EXIT_BUTTON_LABEL = "Exit";
+	final private String HOST = "Host";
+	final private String JOIN = "Join";
+	final private String EXIT = "Exit";
 	
 	private SpriteBatch batch = null;
-	private OrthographicCamera camera = null;
-	private BitmapFont font = null;
-	private Label headingLabel = null;
-	private Button hostButton = null;
-	private Button joinButton = null;
-	private Button exitButton = null;
-	private int lineHeight = 0;
+	private OrthographicCamera camera = null;	
+	private Stage stage;
+	private TextButton btnHost;
+	private TextButton btnJoin;
+	private TextButton btnExit;
 	
 	/**
 	 * Initializer
 	 */
 	public MainMenuScreen() {
 		this.batch = new SpriteBatch();
-		this.font = new BitmapFont();
-		this.lineHeight = Math.round(2.5f * font.getCapHeight());
-		this.headingLabel = new Label(HEAD_LABEL, this.font);
-		this.hostButton = new Button(HOST_BUTTON_LABEL, this.font, new ScreenSwitchHandler(Screen.GAME));
-		this.joinButton = new Button(JOIN_BUTTON_LABEL, this.font, new ScreenSwitchHandler(Screen.LOBBY));
-		this.exitButton = new Button(EXIT_BUTTON_LABEL, this.font, new ButtonHandler() {
-			
-			@Override
-			public void onClick() {
-				Gdx.app.exit();
-				
+		
+		this.stage = new Stage();
+		Gdx.input.setInputProcessor(stage);
+		
+		Skin skin = new Skin(Gdx.files.internal("data/ui/uiskin.json"));
+		
+		this.btnHost = new TextButton(HOST, skin);
+		this.btnHost.setBounds(300, 300, 300, 60);
+		this.btnHost.addListener(new ClickListener() {
+			public void touchUp(InputEvent e, float x, float y, int point, int button) {
+				ScreenManager.getInstance().show(Screen.INTRO);
 			}
 		});
+		this.stage.addActor(this.btnHost);
 	}
 	
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(0.5f, 0.5f, 0.5f, 1f);
+		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-		headingLabel.draw(batch);
-		hostButton.draw(batch, camera);
-		joinButton.draw(batch, camera);
-		exitButton.draw(batch, camera);
-		batch.end();
+		
+		stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+        stage.draw();
 	}
 
 	@Override
@@ -64,17 +60,6 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, width, height);
 		batch.setProjectionMatrix(camera.combined);
-		int centerX = width / 2;
-		int centerY = height / 2;
-		headingLabel.setX(centerX - headingLabel.getWidth() / 2);
-		headingLabel.setY(centerY + 2 * lineHeight);
-		hostButton.setX(centerX - hostButton.getWidth() / 2);
-		hostButton.setY(centerY + lineHeight);
-		joinButton.setX(centerX - joinButton.getWidth() / 2);
-		joinButton.setY(centerY);
-		exitButton.setX(centerX - exitButton.getWidth() / 2);
-		exitButton.setY(centerY - lineHeight); 
-		
 	}
 
 	@Override
@@ -103,7 +88,6 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 
 	@Override
 	public void dispose() {
-		font.dispose();
 		batch.dispose();	
 	}
 

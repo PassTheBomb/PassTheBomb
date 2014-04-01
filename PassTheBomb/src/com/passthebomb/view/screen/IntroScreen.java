@@ -12,8 +12,8 @@ import com.passthebomb.model.local.Screen;
 
 public class IntroScreen implements com.badlogic.gdx.Screen{
 
-	private static final String LIB = "lib";
-	private static final String GDX = "GDX";
+	private static final String PASS = "passThe";
+	private static final String BOMB = "BOMB";
 	
 	private SpriteBatch batch = null;
 	private BitmapFont font = null; 
@@ -24,10 +24,10 @@ public class IntroScreen implements com.badlogic.gdx.Screen{
 	public IntroScreen() {
 		batch = new SpriteBatch();
 		font = new BitmapFont();
-		TextBounds wholeCaptionBounds = font.getBounds(LIB + GDX);
+		TextBounds wholeCaptionBounds = font.getBounds(PASS + BOMB);
 		captionX1 = -wholeCaptionBounds.width/2;
 		captionY = wholeCaptionBounds.height/2;
-		captionX2 = captionX1 + font.getBounds(LIB).width + 1f;
+		captionX2 = captionX1 + font.getBounds(PASS).width + 1f;
 	}
 
 	@Override
@@ -36,9 +36,9 @@ public class IntroScreen implements com.badlogic.gdx.Screen{
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		batch.begin();
 		font.setColor(0f, 0f, 0f, 1f);
-		font.draw(batch, LIB, captionX1, captionY);
+		font.draw(batch, PASS, captionX1, captionY);
 		font.setColor(1f, 0f, 0f, 1f);
-		font.draw(batch, GDX, captionX2, captionY);
+		font.draw(batch, BOMB, captionX2, captionY);
 		batch.end();
 	}
 
