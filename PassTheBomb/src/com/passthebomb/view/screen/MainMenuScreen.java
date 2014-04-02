@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.passthebomb.controller.ScreenManager;
 import com.passthebomb.model.local.Screen;
+import com.passthebomb.model.local.Utils;
 
 public class MainMenuScreen implements com.badlogic.gdx.Screen{
 	
@@ -37,13 +38,32 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 		Skin skin = new Skin(Gdx.files.internal("data/ui/uiskin.json"));
 		
 		this.btnHost = new TextButton(HOST, skin);
-		this.btnHost.setBounds(300, 300, 300, 60);
+		this.btnHost.setBounds(250, 310, 300, 60);
 		this.btnHost.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
-				ScreenManager.getInstance().show(Screen.INTRO);
+				ScreenManager.getInstance().show(Screen.WAIT);
+				System.out.println(Utils.getIPAddress(true));
 			}
 		});
 		this.stage.addActor(this.btnHost);
+		
+		this.btnJoin = new TextButton(JOIN, skin);
+		this.btnJoin.setBounds(250, 230, 300, 60);
+		this.btnJoin.addListener(new ClickListener() {
+			public void touchUp(InputEvent e, float x, float y, int point, int button) {
+				ScreenManager.getInstance().show(Screen.LOBBY);
+			}
+		});
+		this.stage.addActor(this.btnJoin);
+		
+		this.btnExit = new TextButton(EXIT, skin);
+		this.btnExit.setBounds(250, 150, 300, 60);
+		this.btnExit.addListener(new ClickListener() {
+			public void touchUp(InputEvent e, float x, float y, int point, int button) {
+				Gdx.app.exit();
+			}
+		});
+		this.stage.addActor(this.btnExit);
 	}
 	
 	@Override
@@ -71,7 +91,7 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 	@Override
 	public void hide() {
 		// TODO Auto-generated method stub
-		
+		ScreenManager.getInstance().dispose(Screen.MAIN_MENU);
 	}
 
 	@Override
