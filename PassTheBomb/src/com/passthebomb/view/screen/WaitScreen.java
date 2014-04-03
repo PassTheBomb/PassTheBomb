@@ -3,9 +3,6 @@ package com.passthebomb.view.screen;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -34,7 +31,7 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
         font.setColor(Color.RED);
         numOfPlayerJoined = 1;
         try {
-			socket = new Socket(HOST, PORT);
+			this.socket = new Socket(HOST, PORT);
 			inChannel = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -67,6 +64,13 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 		batch.end();
 	}
 
+	public int getNumOfPlayerJoined() {
+		return numOfPlayerJoined;
+	}
+	public Socket getSocket() {
+		return socket;
+	}
+	
 	@Override
 	public void resize(int width, int height) {
 		// TODO Auto-generated method stub
