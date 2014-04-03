@@ -15,7 +15,7 @@ import java.util.Random;
  */
 public class Server {
 
-	static final int PLAYERS_PER_GAME = 4;
+	static final int PLAYERS_PER_GAME = 1;
 
 	public static void main(String[] args) throws Exception {
 		

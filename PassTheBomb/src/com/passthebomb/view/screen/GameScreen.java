@@ -27,7 +27,7 @@ public class GameScreen implements Screen {
 	private Player player;
 	private Opponent[] oppList = new Opponent[4];
 	
-	volatile static String HOST = "192.168.81.158"; // MODIFY THIS FIELD AS REQUIRED.
+	volatile static String HOST = "192.168.82.9"; // MODIFY THIS FIELD AS REQUIRED.
 	static final int PORT = 5432;
 
 	Socket hostSocket;
@@ -76,7 +76,7 @@ public class GameScreen implements Screen {
 			
 		
 		batch = new SpriteBatch();
-		bg = Background.createBG(new Texture(Gdx.files.internal("background.jpg")), new Vector2(-624,-804));
+		bg = Background.createBG(new Texture(Gdx.files.internal("background.png")), new Vector2(-624,-804));
 		
 		Texture[][] charTexture = new Texture[4][2];
 		charTexture[0][0] = new Texture(Gdx.files.internal("circle_r.png"));
@@ -119,50 +119,50 @@ public class GameScreen implements Screen {
 		
 		
 		// set the clear colour to r, g, b, a
-				Gdx.gl.glClearColor(0, 0, 0.2f, 1);
-				// clear screen
-				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-				// update camera
-				camera.update();
-				// set SpriteBatch to camera coordinate system
-				batch.setProjectionMatrix(camera.combined);
-				// start new batch
-				batch.begin();
-				// draw in the new batch
-				batch.draw(bg.getBackgroundImg(), bg.getBackgroundPos().x, bg.getBackgroundPos().y);
-				batch.draw(player.getCharImg(), player.getCharImgX(), player.getCharImgY());
-				
-				for(int i = 0; i < 4; i++){
-					if (i != id){
-						batch.draw(oppList[i].getCharImg(), oppList[i].getCharImgX(), oppList[i].getCharImgY());
-					}
+		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
+		// clear screen
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		// update camera
+		camera.update();
+		// set SpriteBatch to camera coordinate system
+		batch.setProjectionMatrix(camera.combined);
+		// start new batch
+		batch.begin();
+		// draw in the new batch
+		batch.draw(bg.getBackgroundImg(), bg.getBackgroundPos().x, bg.getBackgroundPos().y);
+		batch.draw(player.getCharImg(), player.getCharImgX(), player.getCharImgY());
+		
+		for(int i = 0; i < 4; i++){
+			if (i != id){
+				batch.draw(oppList[i].getCharImg(), oppList[i].getCharImgX(), oppList[i].getCharImgY());
+			}
+		}
+		// end batch. **Note, all image rendering updates should go between
+		// begin and end
+		batch.end();
+		// acquire touch input
+		if (Gdx.input.isTouched()) {
+			// acquire touch position
+			touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+			// change position from global coordinates to camera coordinates
+			camera.unproject(touchPos);
+			player.move(touchPos);
+			// update the cicle position
+			
+		}
+		player.update();
+		int collidedTarget = -1;
+		for (int i = 0; i < 4; i++){
+			if (i != id){
+				if (player.collide(oppList[i])){
+					collidedTarget = i;
 				}
-				// end batch. **Note, all image rendering updates should go between
-				// begin and end
-				batch.end();
-				// acquire touch input
-				if (Gdx.input.isTouched()) {
-					// acquire touch position
-					touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-					// change position from global coordinates to camera coordinates
-					camera.unproject(touchPos);
-					player.move(touchPos);
-					// update the cicle position
-					
-				}
-				player.update();
-				int collidedTarget = -1;
-				for (int i = 0; i < 4; i++){
-					if (i != id){
-						if (player.collide(oppList[i])){
-							collidedTarget = i;
-						}
-					}
-				}
-				
-				
-				//compile message to send to server;
-				outputToHost.println(id+","+player.getAbsX()+","+player.getAbsY()+","+collidedTarget+","+player.getBombState());
+			}
+		}
+		
+		
+		//compile message to send to server;
+		outputToHost.println(id+","+player.getAbsX()+","+player.getAbsY()+","+collidedTarget+","+player.getBombState());
 	}
 
 	@Override
