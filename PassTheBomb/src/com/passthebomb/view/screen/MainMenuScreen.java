@@ -11,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.passthebomb.controller.ScreenManager;
 import com.passthebomb.model.local.Screen;
-import com.passthebomb.model.local.Utils;
 
 public class MainMenuScreen implements com.badlogic.gdx.Screen{
 	
@@ -42,7 +41,6 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 		this.btnHost.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				ScreenManager.getInstance().show(Screen.WAIT);
-				System.out.println(Utils.getIPAddress(true));
 			}
 		});
 		this.stage.addActor(this.btnHost);
