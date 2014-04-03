@@ -1,5 +1,11 @@
 package com.passthebomb.view.screen;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -18,33 +24,100 @@ public class GameScreen implements Screen {
 	private SpriteBatch batch;
 	private Vector3 touchPos;
 	private Background bg;
-	private Player player1;
-	private Opponent player2, player3, player4;
+	private Player player;
+	private Opponent[] oppList = new Opponent[4];
 	
+	volatile static String HOST = "192.168.81.158"; // MODIFY THIS FIELD AS REQUIRED.
+	static final int PORT = 5432;
+
+	Socket hostSocket;
+	private PrintWriter outputToHost;
+	private BufferedReader inputFromHost;
+	private String output;		// String output to server.
+	private String input; 		// String input from server.
+	
+	
+	private int id;				// Player id.
+	private int bombHolder; 	// Indicates the player id which holds the bomb.
+	private Vector3[] posList;
+	private boolean[] bombList;
+
+	private Listener runnableListener;
+	private Thread listener;
 	
 	public GameScreen() {
+		try {
+			// Set up connections and i/o streams.
+			hostSocket = new Socket(HOST, PORT);
+			outputToHost = new PrintWriter(hostSocket.getOutputStream(), true);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		runnableListener = new Listener(hostSocket, this);
+		listener = new Thread(runnableListener);
+		listener.start();
+		
+		try {
+			synchronized(this) {
+				this.wait();
+			}
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		id = runnableListener.getWhoAmI();
+		posList = runnableListener.getPositionList();
+		bombList = runnableListener.getBombList();
+		
+		//Setup with first line of input.
+			
+		
 		batch = new SpriteBatch();
 		bg = Background.createBG(new Texture(Gdx.files.internal("background.jpg")), new Vector2(-624,-804));
-		Texture[] player1Texture = new Texture[2];
-		player1Texture[0] = new Texture(Gdx.files.internal("circle_r.png"));
-		player1Texture[1] = new Texture(Gdx.files.internal("circle_r_bomb.png"));	
-		Texture[] player2Texture = new Texture[2];
-		player2Texture[0] = new Texture(Gdx.files.internal("circle_b.png"));
-		player2Texture[1] = new Texture(Gdx.files.internal("circle_b_bomb.png"));	
-		Texture[] player3Texture = new Texture[2];
-		player3Texture[0] = new Texture(Gdx.files.internal("circle_b.png"));
-		player3Texture[1] = new Texture(Gdx.files.internal("circle_b_bomb.png"));	
-		Texture[] player4Texture = new Texture[2];
-		player4Texture[0] = new Texture(Gdx.files.internal("circle_b.png"));
-		player4Texture[1] = new Texture(Gdx.files.internal("circle_b_bomb.png"));
-		player1 = new Player(new Vector2(774, 1044), player1Texture, true, bg);
-		player2 = new Opponent(new Vector2(1274, 1044), player2Texture, false, bg);
-		player3 = new Opponent(new Vector2(1274, 1244), player3Texture, true, bg);
-		player4 = new Opponent(new Vector2(1274, 844), player4Texture, false, bg);
+		
+		Texture[][] charTexture = new Texture[4][2];
+		charTexture[0][0] = new Texture(Gdx.files.internal("circle_r.png"));
+		charTexture[0][1] = new Texture(Gdx.files.internal("circle_r_bomb.png"));	
+		charTexture[1][0] = new Texture(Gdx.files.internal("circle_r.png"));
+		charTexture[1][1] = new Texture(Gdx.files.internal("circle_r_bomb.png"));	
+		charTexture[2][0] = new Texture(Gdx.files.internal("circle_r.png"));
+		charTexture[2][1] = new Texture(Gdx.files.internal("circle_r_bomb.png"));	
+		charTexture[3][0] = new Texture(Gdx.files.internal("circle_r.png"));
+		charTexture[3][1] = new Texture(Gdx.files.internal("circle_r_bomb.png"));	
+		System.out.println(id);
+		System.out.println(posList.length);
+		System.out.println(bombList.length);
+		System.out.println(charTexture.length);
+		player = new Player(new Vector2(posList[id].x,posList[id].y), charTexture[id], bombList[id], bg);
+		
+		for(int i = 0; i < 4; i++){
+			if (i != id){
+				oppList[i] =  new Opponent(new Vector2(posList[i].x,posList[i].y), charTexture[i], bombList[i], bg);
+			}
+			else{
+				oppList[i] = null;
+			}
+		}
+		
 	}
 
 	@Override
 	public void render(float delta) {
+		posList = runnableListener.getPositionList();
+		bombList = runnableListener.getBombList();
+		
+		for(int i = 0; i < 4; i++){
+			if (i != id){
+				oppList[i].move(posList[i]);
+				oppList[i].setBomb(bombList[i]);
+			}
+		}
+		player.setBomb(bombList[id]);
+		
+		
 		// set the clear colour to r, g, b, a
 				Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 				// clear screen
@@ -57,10 +130,13 @@ public class GameScreen implements Screen {
 				batch.begin();
 				// draw in the new batch
 				batch.draw(bg.getBackgroundImg(), bg.getBackgroundPos().x, bg.getBackgroundPos().y);
-				batch.draw(player1.getCharImg(), player1.getCharImgX(), player1.getCharImgY());
-				batch.draw(player2.getCharImg(), player2.getCharImgX(), player2.getCharImgY());
-				batch.draw(player3.getCharImg(), player3.getCharImgX(), player3.getCharImgY());
-				batch.draw(player4.getCharImg(), player4.getCharImgX(), player4.getCharImgY());
+				batch.draw(player.getCharImg(), player.getCharImgX(), player.getCharImgY());
+				
+				for(int i = 0; i < 4; i++){
+					if (i != id){
+						batch.draw(oppList[i].getCharImg(), oppList[i].getCharImgX(), oppList[i].getCharImgY());
+					}
+				}
 				// end batch. **Note, all image rendering updates should go between
 				// begin and end
 				batch.end();
@@ -70,20 +146,23 @@ public class GameScreen implements Screen {
 					touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 					// change position from global coordinates to camera coordinates
 					camera.unproject(touchPos);
-					player1.move(touchPos);
+					player.move(touchPos);
 					// update the cicle position
 					
 				}
-				player1.collide(player2);
-				player1.collide(player3);
-				player1.collide(player4);
-				player2.collide(player1);
-				player3.collide(player1);
-				player4.collide(player1);
-				player1.update();
-				player2.update();
-				player3.update();
-				player4.update();
+				player.update();
+				int collidedTarget = -1;
+				for (int i = 0; i < 4; i++){
+					if (i != id){
+						if (player.collide(oppList[i])){
+							collidedTarget = i;
+						}
+					}
+				}
+				
+				
+				//compile message to send to server;
+				outputToHost.println(id+","+player.getAbsX()+","+player.getAbsY()+","+collidedTarget+","+player.getBombState());
 	}
 
 	@Override
@@ -120,9 +199,166 @@ public class GameScreen implements Screen {
 	@Override
 	public void dispose() {
 		batch.dispose();
-		player1.dispose();
-		player2.dispose();
+		player.dispose();
+		for (int i = 0 ; i < 4; i ++){
+			if (i != id){
+				oppList[i].dispose();
+			}
+		}
 		bg.dispose();
 	}
 
+	
 }
+
+class Listener implements Runnable{
+	private final static int PLAYER_LIMIT = 4;
+	
+	private BufferedReader inputFromHost;
+	private Socket socket;
+	
+	private volatile static int whoAmI = -1;
+	private volatile static Vector3[] positionList = new Vector3[PLAYER_LIMIT];
+	private volatile static boolean[] bombList = new boolean[PLAYER_LIMIT];
+
+	private GameScreen mainThread;
+	
+	public Listener(Socket socket, GameScreen mainThread){
+		this.socket = socket;
+		this.mainThread = mainThread;
+	}
+	@Override
+	public void run() {
+
+		try {
+			inputFromHost 
+			= new BufferedReader(
+					new InputStreamReader(socket.getInputStream()));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Failed to acquire listening reader");
+		}
+		try {
+			String[] passedInfo = inputFromHost.readLine().split(";");
+			whoAmI = Integer.parseInt(passedInfo[0]);
+			String[] currentPlayerInfo;
+			int player,x,y;
+			for (int i = 1; i < passedInfo.length; i++){
+				currentPlayerInfo = passedInfo[i].split(",");
+				player = Integer.parseInt(currentPlayerInfo[0]);
+				x = Integer.parseInt(currentPlayerInfo[1]);
+				y = Integer.parseInt(currentPlayerInfo[2]);
+				positionList[player] = new Vector3(x,y,0);
+				bombList[player] = Boolean.parseBoolean(currentPlayerInfo[3]);
+			}
+			
+			synchronized(mainThread) {
+				mainThread.notify();	
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		while(true){
+			try {
+				String[] passedInfo = inputFromHost.readLine().split(",");
+				for (int i = 0; i < passedInfo.length; i++){
+					System.out.println(passedInfo[i]);
+				}
+				int player = Integer.parseInt(passedInfo[0]);
+				float x = Float.parseFloat(passedInfo[1]);
+				float y = Float.parseFloat(passedInfo[2]);
+				positionList[player] = new Vector3(x,y,0);
+				bombList[player] = Boolean.parseBoolean(passedInfo[3]);;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+	public int getWhoAmI(){
+		return whoAmI;
+	}
+	
+	public Vector3[] getPositionList(){
+		return positionList;
+	}
+	
+	public boolean[] getBombList(){
+		return bombList;
+	}
+}
+/*//Set player id and bomb holder as dictated by the server.
+			String[] initInfo;
+			initInfo = inputFromHost.readLine().split(",");
+			id = Integer.parseInt(initInfo[0]);
+			bombHolder = Integer.parseInt(initInfo[1]);
+
+			 
+			 * TODO: Load the game screen with the player at the correct position, 
+			 *  	 according to his id.
+			 *  	
+			 *       Also, assign bomb to the right player.
+			 
+			
+
+			// Communicate with server until the bomb has exploded.
+			while (true) {
+
+				
+				 * TODO: Update the game based on information from server.
+				 
+				if (inputFromHost.ready()) {
+
+					input = inputFromHost.readLine();
+
+					// Check if bomb has exploded and exit loop if exploded.
+					if (input.equals("Exploded")) {
+						
+						
+						 * TODO: Check who has the bomb and explode him to end game.
+						 
+						
+						main.runOnUiThread(new Runnable() {  
+							@Override
+							public void run() {
+								main.tv1.setText("BOMB EXPLODED. GAME OVER.");
+							}
+						});
+						break; 
+					}
+
+					String[] array = input.split(",");
+					final int received_id = Integer.parseInt(array[0]);
+					final int received_action = Integer.parseInt(array[1]);
+
+					main.runOnUiThread(new Runnable() {  
+						@Override
+						public void run() {
+							if (received_id == 0) {
+								if (received_action == 0) {
+									main.cb1.setChecked(false);
+								} else {
+									main.cb1.setChecked(true);
+								}
+							} else {
+								if (received_action == 0) {
+									main.cb2.setChecked(false);
+								} else {
+									main.cb2.setChecked(true);
+								}
+							}
+						}
+					});
+				}
+			}
+
+			// Perform clean up logic.
+			outputToHost.close();
+			inputFromHost.close();
+			hostSocket.close();
+
+		} */

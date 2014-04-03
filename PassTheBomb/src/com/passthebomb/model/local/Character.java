@@ -16,6 +16,7 @@ public abstract class Character {
 	private Background bg;
 	
 	private boolean carryingBomb;
+	private boolean bombPass;
 	private boolean alive;
 	
 	
@@ -27,13 +28,14 @@ public abstract class Character {
 		Vector2 temp = new Vector2(this.bg.getBackgroundPos().x,this.bg.getBackgroundPos().y);
 		this.alive = true;
 		this.circle = new Circle(temp.add(absStartPos), RADIUS);
+		this.bombPass = false;
 	}
 	
 	protected abstract void update();
 	
 	protected abstract void move(Vector3 tgtPos);
 	
-	protected abstract void collide(Character c);
+	protected abstract boolean collide(Character c);
 	
 	protected Circle getCharBox() {
 		return circle;
@@ -54,6 +56,13 @@ public abstract class Character {
 
 	public float getCharImgY(){
 		return circle.y - RADIUS;
+	}
+	public float getAbsX(){
+		return absPos.x;
+	}
+
+	public float getAbsY(){
+		return absPos.y;
 	}
 	
 	public void dispose() {
@@ -77,19 +86,36 @@ public abstract class Character {
 		circle.x += bg.getBackgroundPos().x + absPos.x;
 		circle.y += bg.getBackgroundPos().y + absPos.y;
 	}
+
+
+	protected void updateAbsPos() {
+		this.absPos.x = circle.x - bg.getBackgroundPos().x;
+		this.absPos.y = circle.y - bg.getBackgroundPos().y;
+	}
 	
 	protected Background getBg() {
 		return bg;
 	}
 
-	protected boolean isCarryingBomb() {
+
+	public void setBomb(boolean bombState){
+		if (carryingBomb != bombState){
+			bombPass = true;
+		}
+		carryingBomb = bombState;
+	}
+
+	public boolean getBombState(){
 		return carryingBomb;
 	}
 
-	protected void changeBombState(){
-		carryingBomb = !carryingBomb;
+	public boolean getBombPass(){
+		return bombPass;
 	}
-
+	
+	public void resetBombPass(){
+		bombPass = false;
+	}
 	protected boolean isAlive() {
 		return alive;
 	}
