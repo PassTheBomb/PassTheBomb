@@ -24,13 +24,13 @@ public class GameScreen implements Screen {
 	
 	public GameScreen() {
 		batch = new SpriteBatch();
-		bg = Background.createBG(new Texture(Gdx.files.internal("background.jpg")), new Vector2(-624,-804));
+		bg = Background.createBG(new Texture(Gdx.files.internal("background.png")), new Vector2(-624,-804));
 		Texture[] player1Texture = new Texture[2];
-		player1Texture[0] = new Texture(Gdx.files.internal("circle_r.png"));
-		player1Texture[1] = new Texture(Gdx.files.internal("circle_r_bomb.png"));	
+		player1Texture[0] = new Texture(Gdx.files.internal("player.png"));
+		player1Texture[1] = new Texture(Gdx.files.internal("player.png"));	
 		Texture[] player2Texture = new Texture[2];
-		player2Texture[0] = new Texture(Gdx.files.internal("circle_b.png"));
-		player2Texture[1] = new Texture(Gdx.files.internal("circle_b_bomb.png"));	
+		player2Texture[0] = new Texture(Gdx.files.internal("player.png"));
+		player2Texture[1] = new Texture(Gdx.files.internal("opp.png"));	
 		Texture[] player3Texture = new Texture[2];
 		player3Texture[0] = new Texture(Gdx.files.internal("circle_b.png"));
 		player3Texture[1] = new Texture(Gdx.files.internal("circle_b_bomb.png"));	

@@ -51,7 +51,7 @@ public class IntroScreen implements com.badlogic.gdx.Screen{
 	@Override
 	public void show() {
 		/* schedule to show main menu screen after 2 seconds */
-		Timer.schedule(new ScreenSwitchTask(Screen.MAIN_MENU), 2f);
+		Timer.schedule(new ScreenSwitchTask(Screen.GAME), 2f);
 	}
 
 	@Override
