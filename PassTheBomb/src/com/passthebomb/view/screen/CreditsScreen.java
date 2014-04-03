@@ -4,6 +4,10 @@ import com.badlogic.gdx.Screen;
 
 public class CreditsScreen implements Screen{
 
+	public CreditsScreen(com.badlogic.gdx.Screen lastScreen) {
+		
+	}
+	
 	@Override
 	public void render(float delta) {
 		// TODO Auto-generated method stub

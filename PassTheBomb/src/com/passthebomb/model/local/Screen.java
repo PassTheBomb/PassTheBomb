@@ -10,45 +10,45 @@ import com.passthebomb.view.screen.WaitScreen;
 public enum Screen {
 	INTRO {
         @Override
-        public com.badlogic.gdx.Screen getScreenInstance() {
-            return new IntroScreen();
+        public com.badlogic.gdx.Screen getScreenInstance(com.badlogic.gdx.Screen lastScreen) {
+            return new IntroScreen(lastScreen);
         }
     },
 	
 	WAIT {
         @Override
-        public com.badlogic.gdx.Screen getScreenInstance() {
-            return new WaitScreen();
+        public com.badlogic.gdx.Screen getScreenInstance(com.badlogic.gdx.Screen lastScreen) {
+            return new WaitScreen(lastScreen);
         }
     },
  
     MAIN_MENU {
         @Override
-        public com.badlogic.gdx.Screen getScreenInstance() {
-             return new MainMenuScreen();
+        public com.badlogic.gdx.Screen getScreenInstance(com.badlogic.gdx.Screen lastScreen) {
+             return new MainMenuScreen(lastScreen);
         }
     },
  
     GAME {
         @Override
-        public com.badlogic.gdx.Screen getScreenInstance() {
-             return new GameScreen();
+        public com.badlogic.gdx.Screen getScreenInstance(com.badlogic.gdx.Screen lastScreen) {
+             return new GameScreen(lastScreen);
         }
     },
  
     CREDITS {
         @Override
-        public com.badlogic.gdx.Screen getScreenInstance() {
-             return new CreditsScreen();
+        public com.badlogic.gdx.Screen getScreenInstance(com.badlogic.gdx.Screen lastScreen) {
+             return new CreditsScreen(lastScreen);
         }
     },
     
     LOBBY {
     	@Override
-        public com.badlogic.gdx.Screen getScreenInstance() {
-             return new LobbyListScreen();
+        public com.badlogic.gdx.Screen getScreenInstance(com.badlogic.gdx.Screen lastScreen) {
+             return new LobbyListScreen(lastScreen);
         }
     };
  
-    public abstract com.badlogic.gdx.Screen getScreenInstance();
+    public abstract com.badlogic.gdx.Screen getScreenInstance(com.badlogic.gdx.Screen lastScreen);
 }

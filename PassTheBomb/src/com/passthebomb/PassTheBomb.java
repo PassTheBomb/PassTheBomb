@@ -20,7 +20,7 @@ public class PassTheBomb extends Game {
 	@Override
 	public void create() {
 		ScreenManager.getInstance().initialize(this);
-		ScreenManager.getInstance().show(Screen.INTRO);
+		ScreenManager.getInstance().show(Screen.INTRO, null);
 	}
 /*	private OrthographicCamera camera;
 	private SpriteBatch batch;

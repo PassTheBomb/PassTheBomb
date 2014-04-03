@@ -16,7 +16,7 @@ public class ScreenSwitchTask extends Task{
 	 * This method is in charge of changing screen
 	 */
 	public void run() {
-		ScreenManager.getInstance().show(screen);
+		ScreenManager.getInstance().show(screen, null);
 	}
 
 }

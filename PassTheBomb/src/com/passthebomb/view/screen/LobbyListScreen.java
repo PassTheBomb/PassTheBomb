@@ -1,13 +1,44 @@
 package com.passthebomb.view.screen;
 
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.passthebomb.controller.ScreenManager;
+import com.passthebomb.model.local.Screen;
 
-public class LobbyListScreen implements Screen{
+public class LobbyListScreen implements com.badlogic.gdx.Screen{
+
+	private Stage stage;
+	private TextButton btnHost;
+	public String str = "Lobby";
+	
+	public LobbyListScreen(com.badlogic.gdx.Screen lastScreen) {
+		this.stage = new Stage();
+		Gdx.input.setInputProcessor(stage);
+		
+		Skin skin = new Skin(Gdx.files.internal("data/ui/uiskin.json"));
+		
+		this.btnHost = new TextButton("CHOOSE", skin);
+		this.btnHost.setBounds(250, 300, 300, 60);
+		this.btnHost.addListener(new ClickListener() {
+			public void touchUp(InputEvent e, float x, float y, int point, int button) {
+				ScreenManager.getInstance().show(Screen.WAIT, LobbyListScreen.this);
+			}
+		});
+		this.stage.addActor(this.btnHost);
+	}
 
 	@Override
 	public void render(float delta) {
-		// TODO Auto-generated method stub
+		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
+		stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+        stage.draw();
 	}
 
 	@Override
@@ -25,7 +56,7 @@ public class LobbyListScreen implements Screen{
 	@Override
 	public void hide() {
 		// TODO Auto-generated method stub
-		
+		ScreenManager.getInstance().dispose(Screen.LOBBY);
 	}
 
 	@Override

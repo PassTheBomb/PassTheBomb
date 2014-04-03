@@ -45,7 +45,7 @@ public class GameScreen implements Screen {
 	private Listener runnableListener;
 	private Thread listener;
 	
-	public GameScreen() {
+	public GameScreen(com.badlogic.gdx.Screen lastScreen) {
 		try {
 			// Set up connections and i/o streams.
 			hostSocket = new Socket(HOST, PORT);

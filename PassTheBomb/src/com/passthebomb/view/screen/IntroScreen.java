@@ -21,7 +21,7 @@ public class IntroScreen implements com.badlogic.gdx.Screen{
 	private float captionX2 = 0;
 	private float captionY = 0;
 	
-	public IntroScreen() {
+	public IntroScreen(com.badlogic.gdx.Screen lastScreen) {
 		batch = new SpriteBatch();
 		font = new BitmapFont();
 		TextBounds wholeCaptionBounds = font.getBounds(PASS + BOMB);
