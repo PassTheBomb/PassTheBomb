@@ -35,6 +35,7 @@ public class GameScreen implements Screen {
 	private BufferedReader inputFromHost;
 	private String output;		// String output to server.
 	private String input; 		// String input from server.
+	private WaitScreen lastScreen;
 	
 	
 	private int id;				// Player id.
@@ -46,16 +47,18 @@ public class GameScreen implements Screen {
 	private Thread listener;
 	
 	public GameScreen(com.badlogic.gdx.Screen lastScreen) {
+		this.lastScreen = (WaitScreen)lastScreen;
+		System.out.println(this.lastScreen.getNumOfPlayerJoined());
 		try {
 			// Set up connections and i/o streams.
-			hostSocket = new Socket(HOST, PORT);
+			hostSocket = this.lastScreen.getSocket();
 			outputToHost = new PrintWriter(hostSocket.getOutputStream(), true);
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		
-		runnableListener = new Listener(hostSocket, this);
+		runnableListener = new Listener(this.lastScreen.getSocket(), this);
 		listener = new Thread(runnableListener);
 		listener.start();
 		

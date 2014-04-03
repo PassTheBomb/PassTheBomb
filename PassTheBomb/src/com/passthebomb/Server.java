@@ -15,7 +15,7 @@ import java.util.Random;
  */
 public class Server {
 
-	static final int PLAYERS_PER_GAME = 1;
+	static final int PLAYERS_PER_GAME = 4;
 
 	public static void main(String[] args) throws Exception {
 		
@@ -37,6 +37,10 @@ public class Server {
 			clientSockets.add(socket);
 			count++;
 			System.out.println(count + " p connected.");
+			for(Socket client : clientSockets) {
+				PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+				out.println(clientSockets.size());
+			}
 
 			if (count == PLAYERS_PER_GAME) {
 

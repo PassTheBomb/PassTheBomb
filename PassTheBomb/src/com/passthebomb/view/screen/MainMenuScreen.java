@@ -1,5 +1,8 @@
 package com.passthebomb.view.screen;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -30,6 +33,7 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 	 * Initializer
 	 */
 	public MainMenuScreen(com.badlogic.gdx.Screen lastScreen) {
+		
 		this.batch = new SpriteBatch();
 		
 		this.stage = new Stage();
@@ -37,20 +41,20 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 		
 		Skin skin = new Skin(Gdx.files.internal("data/ui/uiskin.json"));
 		
-		this.btnHost = new TextButton(HOST, skin);
+		/*this.btnHost = new TextButton(HOST, skin);
 		this.btnHost.setBounds(250, 300, 300, 60);
 		this.btnHost.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				ScreenManager.getInstance().show(Screen.WAIT, MainMenuScreen.this);
 			}
 		});
-		this.stage.addActor(this.btnHost);
+		this.stage.addActor(this.btnHost);*/
 		
 		this.btnJoin = new TextButton(JOIN, skin);
 		this.btnJoin.setBounds(250, 210, 300, 60);
 		this.btnJoin.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
-				ScreenManager.getInstance().show(Screen.LOBBY, MainMenuScreen.this);
+				ScreenManager.getInstance().show(Screen.WAIT, MainMenuScreen.this);
 			}
 		});
 		this.stage.addActor(this.btnJoin);
