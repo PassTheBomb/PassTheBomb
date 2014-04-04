@@ -14,6 +14,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.ui.Touchpad.TouchpadStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.passthebomb.model.local.Opponent;
 import com.passthebomb.model.local.Player;
 import com.passthebomb.view.gui.Background;
@@ -26,6 +31,13 @@ public class GameScreen implements Screen {
 	private Background bg;
 	private Player player;
 	private Opponent[] oppList = new Opponent[4];
+	
+	private Touchpad touchpad;
+	private TouchpadStyle touchpadStyle;
+	private Skin touchpadSkin;
+	private Drawable touchBackground;
+	private Drawable touchKnob;
+	private Stage stage;
 	
 	volatile static String HOST = "192.168.82.9"; // MODIFY THIS FIELD AS REQUIRED.
 	static final int PORT = 5432;
@@ -101,6 +113,19 @@ public class GameScreen implements Screen {
 			}
 		}
 		
+		touchpadSkin = new Skin();
+		touchpadSkin.add("touchBackground", new Texture("touchBackground.png"));
+		touchpadSkin.add("touchKnob", new Texture("touchKnob.png"));
+		touchpadStyle = new TouchpadStyle();
+		touchBackground = touchpadSkin.getDrawable("touchBackground");
+		touchKnob = touchpadSkin.getDrawable("touchKnob");
+		touchpadStyle.background = touchBackground;
+		touchpadStyle.knob = touchKnob;
+		touchpad = new Touchpad(10, touchpadStyle);
+		touchpad.setBounds(15, 15, 200, 200);
+		stage = new Stage(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),true, batch);
+		stage.addActor(touchpad);
+		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override
@@ -141,21 +166,29 @@ public class GameScreen implements Screen {
 		// end batch. **Note, all image rendering updates should go between
 		// begin and end
 		batch.end();
-		
+		stage.act(Gdx.graphics.getDeltaTime());	    
+	    stage.draw();
 
 		// acquire touch input
 		if (Gdx.input.isTouched()) {
 			// acquire touch position
-			touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+			touchPos = new Vector3(touchpad.getKnobPercentX()*10, touchpad.getKnobPercentY()*10, 0);
+			System.out.println("X: "+touchpad.getKnobPercentX());
+			System.out.println("Y: "+touchpad.getKnobPercentY());
+			System.out.println("Moving (GameScreen) X: "+(touchPos.x)+" Y:"+(touchPos.y));
 			// change position from global coordinates to camera coordinates
-			camera.unproject(touchPos);
+			//camera.translate(x, y);
 			player.move(touchPos);
+			//player1.setX(blockSprite.getX() + touchpad.getKnobPercentX()*blockSpeed);
+	        //player1.setY(blockSprite.getY() + touchpad.getKnobPercentY()*blockSpeed);
 			// update the cicle position
-			
+
+		}else{
+			touchPos = new Vector3(0,0,0);
 		}
 		
 
-		
+		camera.position.set(player.getCharImgX(), player.getCharImgY(), 0);
 		player.update();
 		int collidedTarget = -1;
 		for (int i = 0; i < 4; i++){

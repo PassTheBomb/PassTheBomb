@@ -42,7 +42,9 @@ public class Player extends Character {
 				}
 				else{
 					tgtPosCpy = tgtPos.cpy();
-					tgtPosCpy.add(new Vector3(-getCharBox().x,-getCharBox().y,0));
+					getCharBox().x += tgtPosCpy.x;// * DELTA_TIME;
+					getCharBox().y += tgtPosCpy.y;// * DELTA_TIME;
+					/*tgtPosCpy.add(new Vector3(-getCharBox().x,-getCharBox().y,0));
 					if (tgtPosCpy.len()> VEL){
 						tgtPosCpy.scl(VEL/tgtPosCpy.len());
 						getCharBox().x += tgtPosCpy.x * DELTA_TIME;
@@ -57,7 +59,7 @@ public class Player extends Character {
 					else{
 						isMoving = false;
 						System.out.println("STOP");
-					}
+					}*/
 				}
 				
 			}
