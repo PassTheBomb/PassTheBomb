@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -23,6 +24,7 @@ public class Server {
 		@SuppressWarnings("resource") 
 		ServerSocket serverSocket = new ServerSocket(5432);
 		LinkedList<Socket> clientSockets = new LinkedList<Socket>();
+		ArrayList<PrintWriter> outArrayList = new ArrayList<PrintWriter>();
 
 		int count = 0; 
 
@@ -35,12 +37,13 @@ public class Server {
 		while (true) {
 			Socket socket = serverSocket.accept();
 			clientSockets.add(socket);
+			outArrayList.add(new PrintWriter(socket.getOutputStream(), true));
 			count++;
 			System.out.println(count + " p connected.");
-			for(Socket client : clientSockets) {
-				PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+			
+			for(PrintWriter out : outArrayList) {
 				out.println(clientSockets.size());
-				System.out.println(client + ";" + count);
+				System.out.println(out + ";" + count);
 			}
 
 			if (count == PLAYERS_PER_GAME) {
@@ -90,6 +93,7 @@ class ClientManager implements Runnable {
 
 		try {
 			for (Socket s : clientSockets) {
+				System.out.println(s.isClosed());
 				inputFromClients.add(
 						new BufferedReader(
 								new InputStreamReader(s.getInputStream()) ));
@@ -115,6 +119,8 @@ class ClientManager implements Runnable {
 			
 			// Inform client of their id and who is the bomb holder. 
 			for (int i = 0; i < size; i++) {
+				inputFromClients.get(i).readLine();
+				
 				String initInfo = i + ";0,824,1024," + bombList[0] + ";1,924,1024," + bombList[1] + ";2,1124,1024," + bombList[2] + ";3,1224,1024," + bombList[3];
 				outputToClients.get(i).println(initInfo);
 			}
