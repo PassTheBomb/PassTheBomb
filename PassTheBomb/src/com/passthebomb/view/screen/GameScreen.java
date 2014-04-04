@@ -37,6 +37,7 @@ public class GameScreen implements Screen {
 	private String input; 		// String input from server.
 	private WaitScreen lastScreen;
 	
+	private int updateCtr = 0;
 	
 	private int id;				// Player id.
 	private int bombHolder; 	// Indicates the player id which holds the bomb.
@@ -104,6 +105,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
+		
 
 		posList = runnableListener.getPositionList();
 		bombList = runnableListener.getBombList();
@@ -166,7 +168,13 @@ public class GameScreen implements Screen {
 		
 		
 		//compile message to send to server;
-		outputToHost.println(id+","+player.getAbsX()+","+player.getAbsY()+","+collidedTarget+","+player.getBombState());
+		if (updateCtr < 5){
+			updateCtr++;
+		}
+		else{
+			outputToHost.println(id+","+player.getAbsX()+","+player.getAbsY()+","+collidedTarget+","+player.getBombState());
+			updateCtr = 0;
+		}
 	
 
 	}
