@@ -92,7 +92,7 @@ public class GameScreen implements Screen {
 		charTexture[3][1] = new Texture(Gdx.files.internal("circle_r_bomb.png"));	
 		player = new Player(new Vector2(posList[id].x,posList[id].y), charTexture[id], bombList[id], bg);
 		
-		for(int i = 0; i < 3; i++){
+		for(int i = 0; i < 4; i++){
 			if (i != id){
 				oppList[i] =  new Opponent(new Vector2(posList[i].x,posList[i].y), charTexture[i], bombList[i], bg);
 			}
@@ -214,7 +214,7 @@ public class GameScreen implements Screen {
 	public void dispose() {
 		batch.dispose();
 		player.dispose();
-		for (int i = 0 ; i < 2; i ++){
+		for (int i = 0 ; i < 4; i ++){
 			if (i != id){
 				oppList[i].dispose();
 			}
