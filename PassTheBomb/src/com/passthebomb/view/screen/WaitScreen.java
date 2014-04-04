@@ -47,7 +47,6 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 		Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
         
-		batch.begin();
 		
 		try {
 			if(inChannel.ready()) {
@@ -57,11 +56,12 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		batch.begin();
 		font.draw(batch, String.valueOf(numOfPlayerJoined), 250, 250);
+		batch.end();
 		if(numOfPlayerJoined == 4) {
 			ScreenManager.getInstance().show(Screen.GAME, this);
 		}
-		batch.end();
 	}
 
 	public int getNumOfPlayerJoined() {

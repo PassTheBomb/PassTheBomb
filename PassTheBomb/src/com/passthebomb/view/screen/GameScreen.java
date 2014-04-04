@@ -48,7 +48,6 @@ public class GameScreen implements Screen {
 	
 	public GameScreen(com.badlogic.gdx.Screen lastScreen) {
 		this.lastScreen = (WaitScreen)lastScreen;
-		System.out.println(this.lastScreen.getNumOfPlayerJoined());
 		try {
 			// Set up connections and i/o streams.
 			hostSocket = this.lastScreen.getSocket();
@@ -90,10 +89,6 @@ public class GameScreen implements Screen {
 		charTexture[2][1] = new Texture(Gdx.files.internal("circle_r_bomb.png"));	
 		charTexture[3][0] = new Texture(Gdx.files.internal("circle_r.png"));
 		charTexture[3][1] = new Texture(Gdx.files.internal("circle_r_bomb.png"));	
-		System.out.println(id);
-		System.out.println(posList.length);
-		System.out.println(bombList.length);
-		System.out.println(charTexture.length);
 		player = new Player(new Vector2(posList[id].x,posList[id].y), charTexture[id], bombList[id], bg);
 		
 		for(int i = 0; i < 4; i++){
@@ -109,6 +104,8 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
+
+		System.out.println("ENTER RENDER");
 		posList = runnableListener.getPositionList();
 		bombList = runnableListener.getBombList();
 		
@@ -120,7 +117,8 @@ public class GameScreen implements Screen {
 		}
 		player.setBomb(bombList[id]);
 		
-		
+
+		System.out.println("SERVER DATA USED");
 		// set the clear colour to r, g, b, a
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		// clear screen
@@ -143,6 +141,9 @@ public class GameScreen implements Screen {
 		// end batch. **Note, all image rendering updates should go between
 		// begin and end
 		batch.end();
+		
+
+		System.out.println("SCREEN DRAWN");
 		// acquire touch input
 		if (Gdx.input.isTouched()) {
 			// acquire touch position
@@ -153,6 +154,10 @@ public class GameScreen implements Screen {
 			// update the cicle position
 			
 		}
+		
+
+		System.out.println("TOUCH DETECTED");
+		
 		player.update();
 		int collidedTarget = -1;
 		for (int i = 0; i < 4; i++){
@@ -166,6 +171,9 @@ public class GameScreen implements Screen {
 		
 		//compile message to send to server;
 		outputToHost.println(id+","+player.getAbsX()+","+player.getAbsY()+","+collidedTarget+","+player.getBombState());
+	
+
+		System.out.println("SERVER UPDATED");
 	}
 
 	@Override
@@ -232,7 +240,7 @@ class Listener implements Runnable{
 	}
 	@Override
 	public void run() {
-
+		System.out.println("THREAD STARTED");
 		try {
 			inputFromHost 
 			= new BufferedReader(
@@ -241,8 +249,12 @@ class Listener implements Runnable{
 			// TODO Auto-generated catch block
 			System.out.println("Failed to acquire listening reader");
 		}
+
+		System.out.println("READER SET UP");
 		try {
-			String[] passedInfo = inputFromHost.readLine().split(";");
+			String input = inputFromHost.readLine();
+			System.out.println("Set Up Input: " + input);
+			String[] passedInfo = input.split(";");
 			whoAmI = Integer.parseInt(passedInfo[0]);
 			String[] currentPlayerInfo;
 			int player,x,y;
@@ -263,20 +275,36 @@ class Listener implements Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		System.out.println("ENTERING WHILE LOOP IN THREAD");
 		while(true){
+			System.out.println("LINE 1");
 			try {
-				String[] passedInfo = inputFromHost.readLine().split(",");
-				for (int i = 0; i < passedInfo.length; i++){
-					System.out.println(passedInfo[i]);
+				System.out.println("LINE 2");
+				String[] passedInfo;
+				System.out.println("LINE 3");
+				if (inputFromHost.ready()){
+					System.out.println("LINE 4");
+					passedInfo = inputFromHost.readLine().split(",");
+					System.out.println("LINE 5");
+					for (int i = 0; i < passedInfo.length; i++){
+						System.out.println(passedInfo[i]);
+					}
+					int player = Integer.parseInt(passedInfo[0]);
+					float x = Float.parseFloat(passedInfo[1]);
+					float y = Float.parseFloat(passedInfo[2]);
+					positionList[player] = new Vector3(x,y,0);
+					bombList[player] = Boolean.parseBoolean(passedInfo[3]);;
 				}
-				int player = Integer.parseInt(passedInfo[0]);
-				float x = Float.parseFloat(passedInfo[1]);
-				float y = Float.parseFloat(passedInfo[2]);
-				positionList[player] = new Vector3(x,y,0);
-				bombList[player] = Boolean.parseBoolean(passedInfo[3]);;
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				if (socket.isClosed()){
+					System.out.println("socket closed");
+				}
+				System.out.println("Unknown Error");
 				e.printStackTrace();
+			}
+			catch (Exception e){
+				System.out.println("RARRRR");
 			}
 		}
 		
