@@ -49,9 +49,8 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
         
 		
 		try {
-			if(inChannel.ready()) {
-				numOfPlayerJoined = Integer.parseInt(inChannel.readLine());
-			}
+			String in = inChannel.readLine();
+			numOfPlayerJoined = Integer.parseInt(in);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

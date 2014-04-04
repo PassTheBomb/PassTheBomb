@@ -105,7 +105,6 @@ public class GameScreen implements Screen {
 	@Override
 	public void render(float delta) {
 
-		System.out.println("ENTER RENDER");
 		posList = runnableListener.getPositionList();
 		bombList = runnableListener.getBombList();
 		
@@ -118,7 +117,6 @@ public class GameScreen implements Screen {
 		player.setBomb(bombList[id]);
 		
 
-		System.out.println("SERVER DATA USED");
 		// set the clear colour to r, g, b, a
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		// clear screen
@@ -143,7 +141,6 @@ public class GameScreen implements Screen {
 		batch.end();
 		
 
-		System.out.println("SCREEN DRAWN");
 		// acquire touch input
 		if (Gdx.input.isTouched()) {
 			// acquire touch position
@@ -156,7 +153,6 @@ public class GameScreen implements Screen {
 		}
 		
 
-		System.out.println("TOUCH DETECTED");
 		
 		player.update();
 		int collidedTarget = -1;
@@ -173,7 +169,6 @@ public class GameScreen implements Screen {
 		outputToHost.println(id+","+player.getAbsX()+","+player.getAbsY()+","+collidedTarget+","+player.getBombState());
 	
 
-		System.out.println("SERVER UPDATED");
 	}
 
 	@Override
@@ -226,6 +221,7 @@ class Listener implements Runnable{
 	private final static int PLAYER_LIMIT = 4;
 	
 	private BufferedReader inputFromHost;
+	private PrintWriter outputToHost;
 	private Socket socket;
 	
 	private volatile static int whoAmI = -1;
@@ -240,20 +236,18 @@ class Listener implements Runnable{
 	}
 	@Override
 	public void run() {
-		System.out.println("THREAD STARTED");
 		try {
 			inputFromHost 
 			= new BufferedReader(
 					new InputStreamReader(socket.getInputStream()));
+			outputToHost = new PrintWriter(socket.getOutputStream(),true);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("Failed to acquire listening reader");
 		}
-
-		System.out.println("READER SET UP");
+		outputToHost.println("ready");
+		System.out.println("READY RARRRT");
 		try {
 			String input = inputFromHost.readLine();
-			System.out.println("Set Up Input: " + input);
 			String[] passedInfo = input.split(";");
 			whoAmI = Integer.parseInt(passedInfo[0]);
 			String[] currentPlayerInfo;
@@ -276,20 +270,14 @@ class Listener implements Runnable{
 			e.printStackTrace();
 		}
 		
-		System.out.println("ENTERING WHILE LOOP IN THREAD");
 		while(true){
-			System.out.println("LINE 1");
 			try {
-				System.out.println("LINE 2");
 				String[] passedInfo;
-				System.out.println("LINE 3");
 				if (inputFromHost.ready()){
-					System.out.println("LINE 4");
 					passedInfo = inputFromHost.readLine().split(",");
-					System.out.println("LINE 5");
-					for (int i = 0; i < passedInfo.length; i++){
+					/*for (int i = 0; i < passedInfo.length; i++){
 						System.out.println(passedInfo[i]);
-					}
+					}*/
 					int player = Integer.parseInt(passedInfo[0]);
 					float x = Float.parseFloat(passedInfo[1]);
 					float y = Float.parseFloat(passedInfo[2]);
