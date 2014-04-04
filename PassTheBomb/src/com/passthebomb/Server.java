@@ -59,6 +59,7 @@ public class Server {
 				// Reset count and clear the existing list of clients sockets. 
 				count = 0;
 				clientSockets.clear();
+				outArrayList.clear();
 			}
 
 			Thread.sleep(1000);
