@@ -168,7 +168,7 @@ public class GameScreen implements Screen {
 		
 		
 		//compile message to send to server;
-		if (updateCtr < 5){
+		if (updateCtr < 2){
 			updateCtr++;
 		}
 		else{

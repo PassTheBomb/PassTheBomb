@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.passthebomb.view.gui.Background;
 
 public class Player extends Character {
-	private final int VEL = 50;
+	private final int VEL = 30;
 	private final double DELTA_TIME = 0.17;
 	private final int BOUND_OFFSET = 100;
 	private int RADIUS = 32;
