@@ -40,6 +40,7 @@ public class Server {
 			for(Socket client : clientSockets) {
 				PrintWriter out = new PrintWriter(client.getOutputStream(), true);
 				out.println(clientSockets.size());
+				System.out.println(client + ";" + count);
 			}
 
 			if (count == PLAYERS_PER_GAME) {
@@ -129,7 +130,10 @@ class ClientManager implements Runnable {
 						
 						/* Receive: 
 						 * 	"id, x_coordinate, y_coordinate, bomb_from, bomb_to" */
-						String input[] = inputFromClients.get(i).readLine().split(",");
+						String in = inputFromClients.get(i).readLine();
+						System.out.println(in);
+						String input[] = in.split(",");
+						
 						
 						int collidedPlayerNo = Integer.parseInt(input[3]);
 						boolean carryBomb = Boolean.parseBoolean(input[4]);
