@@ -89,7 +89,7 @@ class ClientManager implements Runnable {
 		outputToClients = new LinkedList<PrintWriter>();
 		size = Server.PLAYERS_PER_GAME;
 
-		// Set bomb timer to 30sec.
+		// Set bomb timer to 60sec.
 		bombTimer = 60000;
 
 		try {
@@ -122,7 +122,7 @@ class ClientManager implements Runnable {
 			for (int i = 0; i < size; i++) {
 				inputFromClients.get(i).readLine();
 				
-				String initInfo = i + ";0,824,1024," + bombList[0] + ";1,924,1024," + bombList[1] + ";2,1124,1024," + bombList[2] + ";3,1224,1024," + bombList[3];
+				String initInfo = i + ";0,312,512," + bombList[0] + ";1,412,512," + bombList[1] + ";2,712,512," + bombList[2] + ";3,612,512," + bombList[3];
 				outputToClients.get(i).println(initInfo);
 			}
 

@@ -69,7 +69,6 @@ public class GameScreen implements Screen {
 			e.printStackTrace();
 		}
 		
-		
 		runnableListener = new Listener(this.lastScreen.getSocket(), this);
 		listener = new Thread(runnableListener);
 		listener.start();
@@ -93,20 +92,17 @@ public class GameScreen implements Screen {
 		batch = new SpriteBatch();
 		bg = Background.createBG(new Texture(Gdx.files.internal("background.png")), new Vector2(-624,-804));
 		
-		Texture[][] charTexture = new Texture[4][2];
-		charTexture[0][0] = new Texture(Gdx.files.internal("circle_r.png"));
-		charTexture[0][1] = new Texture(Gdx.files.internal("circle_r_bomb.png"));	
-		charTexture[1][0] = new Texture(Gdx.files.internal("circle_r.png"));
-		charTexture[1][1] = new Texture(Gdx.files.internal("circle_r_bomb.png"));	
-		charTexture[2][0] = new Texture(Gdx.files.internal("circle_r.png"));
-		charTexture[2][1] = new Texture(Gdx.files.internal("circle_r_bomb.png"));	
-		charTexture[3][0] = new Texture(Gdx.files.internal("circle_r.png"));
-		charTexture[3][1] = new Texture(Gdx.files.internal("circle_r_bomb.png"));	
-		player = new Player(new Vector2(posList[id].x,posList[id].y), charTexture[id], bombList[id], bg);
+		Texture[] playerTexture = new Texture[2];
+		Texture[] oppTexture = new Texture[2];
+		playerTexture[0] = new Texture(Gdx.files.internal("player_r.png"));
+		playerTexture[1] = new Texture(Gdx.files.internal("player_rb.png"));
+		oppTexture[0] = new Texture(Gdx.files.internal("opp_r.png"));	
+		oppTexture[1] = new Texture(Gdx.files.internal("opp_rb.png"));	
+		player = new Player(new Vector2(posList[id].x,posList[id].y), playerTexture, bombList[id], bg);
 		
 		for(int i = 0; i < 4; i++){
 			if (i != id){
-				oppList[i] =  new Opponent(new Vector2(posList[i].x,posList[i].y), charTexture[i], bombList[i], bg);
+				oppList[i] =  new Opponent(new Vector2(posList[i].x,posList[i].y), oppTexture, bombList[i], bg);
 			}
 			else{
 				oppList[i] = null;
@@ -166,29 +162,32 @@ public class GameScreen implements Screen {
 		// end batch. **Note, all image rendering updates should go between
 		// begin and end
 		batch.end();
+		
 		stage.act(Gdx.graphics.getDeltaTime());	    
 	    stage.draw();
-
-		// acquire touch input
+	    
+	    
+	    touchPos = new Vector3(touchpad.getKnobPercentX()*10, touchpad.getKnobPercentY()*10, 0);
+		System.out.println("X: "+touchpad.getKnobPercentX());
+		System.out.println("Y: "+touchpad.getKnobPercentY());
+		System.out.println("Moving (GameScreen) X: "+(touchPos.x)+" Y:"+(touchPos.y));
+		// change position from global coordinates to camera coordinates
+		//camera.translate(x, y);
+		player.move(touchPos);
+		
+		/*// acquire touch input
 		if (Gdx.input.isTouched()) {
 			// acquire touch position
-			touchPos = new Vector3(touchpad.getKnobPercentX()*10, touchpad.getKnobPercentY()*10, 0);
-			System.out.println("X: "+touchpad.getKnobPercentX());
-			System.out.println("Y: "+touchpad.getKnobPercentY());
-			System.out.println("Moving (GameScreen) X: "+(touchPos.x)+" Y:"+(touchPos.y));
+			touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 			// change position from global coordinates to camera coordinates
-			//camera.translate(x, y);
+			camera.unproject(touchPos);
 			player.move(touchPos);
-			//player1.setX(blockSprite.getX() + touchpad.getKnobPercentX()*blockSpeed);
-	        //player1.setY(blockSprite.getY() + touchpad.getKnobPercentY()*blockSpeed);
 			// update the cicle position
-
-		}else{
-			touchPos = new Vector3(0,0,0);
-		}
+			
+		}*/
 		
-
 		camera.position.set(player.getCharImgX(), player.getCharImgY(), 0);
+		
 		player.update();
 		int collidedTarget = -1;
 		for (int i = 0; i < 4; i++){
@@ -201,13 +200,13 @@ public class GameScreen implements Screen {
 		
 		
 		//compile message to send to server;
-		if (updateCtr < 2){
+		/*if (updateCtr < 2){
 			updateCtr++;
 		}
-		else{
+		else{*/
 			outputToHost.println(id+","+player.getAbsX()+","+player.getAbsY()+","+collidedTarget+","+player.getBombState());
 			updateCtr = 0;
-		}
+		//}
 	
 
 	}
@@ -351,74 +350,3 @@ class Listener implements Runnable{
 		return bombList;
 	}
 }
-/*//Set player id and bomb holder as dictated by the server.
-			String[] initInfo;
-			initInfo = inputFromHost.readLine().split(",");
-			id = Integer.parseInt(initInfo[0]);
-			bombHolder = Integer.parseInt(initInfo[1]);
-
-			 
-			 * TODO: Load the game screen with the player at the correct position, 
-			 *  	 according to his id.
-			 *  	
-			 *       Also, assign bomb to the right player.
-			 
-			
-
-			// Communicate with server until the bomb has exploded.
-			while (true) {
-
-				
-				 * TODO: Update the game based on information from server.
-				 
-				if (inputFromHost.ready()) {
-
-					input = inputFromHost.readLine();
-
-					// Check if bomb has exploded and exit loop if exploded.
-					if (input.equals("Exploded")) {
-						
-						
-						 * TODO: Check who has the bomb and explode him to end game.
-						 
-						
-						main.runOnUiThread(new Runnable() {  
-							@Override
-							public void run() {
-								main.tv1.setText("BOMB EXPLODED. GAME OVER.");
-							}
-						});
-						break; 
-					}
-
-					String[] array = input.split(",");
-					final int received_id = Integer.parseInt(array[0]);
-					final int received_action = Integer.parseInt(array[1]);
-
-					main.runOnUiThread(new Runnable() {  
-						@Override
-						public void run() {
-							if (received_id == 0) {
-								if (received_action == 0) {
-									main.cb1.setChecked(false);
-								} else {
-									main.cb1.setChecked(true);
-								}
-							} else {
-								if (received_action == 0) {
-									main.cb2.setChecked(false);
-								} else {
-									main.cb2.setChecked(true);
-								}
-							}
-						}
-					});
-				}
-			}
-
-			// Perform clean up logic.
-			outputToHost.close();
-			inputFromHost.close();
-			hostSocket.close();
-
-		} */

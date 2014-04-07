@@ -6,8 +6,8 @@ import com.badlogic.gdx.math.Vector2;
 public class Background {
 	private static Background instance = null;
 	private final int LEFT_LIM = 0;
-	private final int RIGHT_LIM = -1248;
-	private final int TOP_LIM = -1568;
+	private final int RIGHT_LIM = -224;
+	private final int TOP_LIM = -544;
 	private final int BOTTOM_LIM = 0;
 	
 	private Texture bgImg;
