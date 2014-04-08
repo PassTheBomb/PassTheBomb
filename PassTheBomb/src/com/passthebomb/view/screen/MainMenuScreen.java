@@ -1,8 +1,5 @@
 package com.passthebomb.view.screen;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -17,14 +14,12 @@ import com.passthebomb.model.local.Screen;
 
 public class MainMenuScreen implements com.badlogic.gdx.Screen{
 	
-	final private String HOST = "Host";
 	final private String JOIN = "Join";
 	final private String EXIT = "Exit";
 	
 	private SpriteBatch batch = null;
 	private OrthographicCamera camera = null;	
 	private Stage stage;
-	private TextButton btnHost;
 	private TextButton btnJoin;
 	private TextButton btnExit;
 	public String str = "Main";
@@ -41,17 +36,14 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 		
 		Skin skin = new Skin(Gdx.files.internal("data/ui/uiskin.json"));
 		
-		/*this.btnHost = new TextButton(HOST, skin);
-		this.btnHost.setBounds(250, 300, 300, 60);
-		this.btnHost.addListener(new ClickListener() {
-			public void touchUp(InputEvent e, float x, float y, int point, int button) {
-				ScreenManager.getInstance().show(Screen.WAIT, MainMenuScreen.this);
-			}
-		});
-		this.stage.addActor(this.btnHost);*/
+		float width = Gdx.graphics.getWidth();
+	    float height = Gdx.graphics.getHeight();
+	    
+	    float resizeWidth = width/800;
+	    float resizeHeight = height/480;
 		
 		this.btnJoin = new TextButton(JOIN, skin);
-		this.btnJoin.setBounds(250, 210, 300, 60);
+		this.btnJoin.setBounds(resizeWidth*250, resizeHeight*210, resizeWidth*300, resizeHeight*60);
 		this.btnJoin.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				ScreenManager.getInstance().show(Screen.WAIT, MainMenuScreen.this);
@@ -60,7 +52,7 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 		this.stage.addActor(this.btnJoin);
 		
 		this.btnExit = new TextButton(EXIT, skin);
-		this.btnExit.setBounds(250, 120, 300, 60);
+		this.btnExit.setBounds(resizeWidth*250, resizeHeight*120, resizeWidth*300, resizeHeight*60);
 		this.btnExit.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				Gdx.app.exit();
