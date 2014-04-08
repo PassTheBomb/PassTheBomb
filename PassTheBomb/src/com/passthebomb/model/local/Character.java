@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.passthebomb.view.gui.Background;
 
 public abstract class Character {
+	private final int[] limits;
 	private final int RADIUS = 32;
 
 	private Vector2 absPos;
@@ -21,14 +22,16 @@ public abstract class Character {
 	
 	
 	protected Character(Vector2 absStartPos, Texture[] imgSet, boolean bomb, Background bg) {
-		this.absPos=absStartPos;
+		//this.absPos=absStartPos;
+		this.circle = new Circle(absStartPos, RADIUS);
 		this.circleImgSet = imgSet;
 		this.carryingBomb = bomb;
 		this.bg = bg;
-		Vector2 temp = new Vector2(this.bg.getBackgroundPos().x,this.bg.getBackgroundPos().y);
+		//Vector2 temp = new Vector2(this.bg.getBackgroundPos().x,this.bg.getBackgroundPos().y);
 		this.alive = true;
-		this.circle = new Circle(temp.add(absStartPos), RADIUS);
+		//this.circle = new Circle(temp.add(absStartPos), RADIUS);
 		this.bombPass = false;
+		this.limits = bg.getLimits();
 	}
 	
 	protected abstract void update();
@@ -36,6 +39,21 @@ public abstract class Character {
 	protected abstract void move(Vector3 tgtPos);
 	
 	protected abstract boolean collide(Character c);
+	
+	public void checkLimits(){
+		if (circle.x<100){
+			circle.x = 100;
+		}
+		else if (circle.x>limits[3]-100){
+			circle.x = limits[3]-100;
+		}
+		if (circle.y<100){
+			circle.y = 100;
+		}
+		else if (circle.y>limits[0]-100){
+			circle.y = limits[0]-100;
+		}
+	}
 	
 	protected Circle getCharBox() {
 		return circle;
@@ -57,40 +75,24 @@ public abstract class Character {
 	public float getCharImgY(){
 		return circle.y - RADIUS;
 	}
-	public float getAbsX(){
-		return absPos.x;
-	}
-
-	public float getAbsY(){
-		return absPos.y;
-	}
 	
 	public void dispose() {
 		circleImgSet[0].dispose();
 		circleImgSet[1].dispose();
 	}
 
-	protected Vector2 getAbsPos() {
-		return absPos;
+	public Vector2 getAbsPos() {
+		return new Vector2(circle.x, circle.y);
 	}
 
 	protected void setAbsPos(Vector2 absPos) {
-		this.absPos = absPos;
-		circle.x += bg.getBackgroundPos().x + absPos.x;
-		circle.y += bg.getBackgroundPos().y + absPos.y;
+		circle.x = absPos.x;
+		circle.y = absPos.y;
 	}
 
 	protected void setAbsPos(float x, float y) {
-		this.absPos.x = x;
-		this.absPos.y = y;
-		circle.x += bg.getBackgroundPos().x + absPos.x;
-		circle.y += bg.getBackgroundPos().y + absPos.y;
-	}
-
-
-	protected void updateAbsPos() {
-		this.absPos.x = circle.x - bg.getBackgroundPos().x;
-		this.absPos.y = circle.y - bg.getBackgroundPos().y;
+		circle.x = x;
+		circle.y = y;
 	}
 	
 	protected Background getBg() {

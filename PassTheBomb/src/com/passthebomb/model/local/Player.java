@@ -27,7 +27,8 @@ public class Player extends Character {
 		collide = false;
 		collideCtr = 0;
 		bombPassCtr = 0;
-		tgtPos = new Vector3(absStartPos.x+bg.getBackgroundPos().x, absStartPos.y+bg.getBackgroundPos().y,0);
+		tgtPos = new Vector3(0, 0 ,0);
+
 	}
 
 	@Override
@@ -75,8 +76,9 @@ public class Player extends Character {
 					collide = false;
 				}
 			}
-			this.updateAbsPos();
-			this.scrollBG();
+			//this.updateAbsPos();
+			//this.scrollBG();
+			checkLimits();
 		}
 		
 	}
@@ -107,7 +109,7 @@ public class Player extends Character {
 		}
 		
 	}
-	private void scrollBG(){
+	/*private void scrollBG(){
 		float diffX = 0;
 		float diffY = 0;
 		Circle charBox = super.getCharBox();
@@ -132,5 +134,126 @@ public class Player extends Character {
 		getBg().scrollY(diffY);
 		tgtPos.x+=diffX;
 		tgtPos.y+=diffY;
+	}*/
+	
+	/*private final int VEL = 50;
+	private final double DELTA_TIME = 0.17;
+	private final int RADIUS = 32;
+	private final int BOUNDARY_OFFSET = 100;
+
+	private Circle circle;
+	private Texture circleImg;
+	private Background bg;
+	private Vector3 targetPos, targetPosCopy;
+	
+	private boolean isMoving;
+	private boolean collide;
+	private boolean carryingBomb;
+	boolean alive;
+	
+	private int collideCounter;
+	
+	protected Player(Vector2 absStartPos, Texture img, boolean bomb, Background bg){
+		this.circleImg = img;
+		absStartPos.x -= RADIUS;
+		absStartPos.y -= RADIUS;
+		this.circle = new Circle(bg.getBackgroundPos().add(absStartPos), RADIUS);
+		this.bg = bg;
+		this.isMoving = false;
+		this.carryingBomb = bomb;
+		this.alive = true;
 	}
+	
+	protected void update(){
+		System.out.println(targetPos);
+		System.out.println(new Vector3(circle.x-RADIUS, circle.y-RADIUS, 0));
+		if(alive){
+			if(isMoving){
+				targetPosCopy = targetPos.cpy();
+				targetPosCopy.add(new Vector3(-circle.x-RADIUS,-circle.y-RADIUS,0));
+				if (targetPosCopy.len()> VEL){
+					targetPosCopy.scl(VEL/targetPosCopy.len());
+					circle.x += targetPosCopy.x * DELTA_TIME;
+					circle.y += targetPosCopy.y * DELTA_TIME;
+					System.out.println("RUN");
+				}
+				else if (targetPosCopy.len()> 0.1){
+					circle.x += targetPosCopy.x*DELTA_TIME;
+					circle.y += targetPosCopy.y*DELTA_TIME;
+					System.out.println("SLOW");
+				}
+				else{
+					isMoving = false;
+					System.out.println("STOP");
+				}
+			}
+			if(collide){
+				targetPosCopy = targetPos.cpy();
+				circle.x += targetPosCopy.x*DELTA_TIME;
+				circle.y += targetPosCopy.y*DELTA_TIME;
+				System.out.println("COLLIDE");
+				collideCounter++;
+				if (collideCounter > 2){
+					collideCounter = 0;
+					collide = false;
+				}
+			}
+			this.scrollBG();
+		}
+	}
+	
+	protected void move(Vector3 pointer){
+		if (!collide){
+			this.targetPos = pointer;
+			this.isMoving = true;
+		}
+		
+	}
+	
+	protected void collidePlayer(Player p){
+		Circle c = p.getPlayerBox();
+		if(circle.overlaps(c)){
+			collide = true;
+			isMoving = false;
+			targetPos = new Vector3((circle.x - c.x),(circle.y - c.y), 0);
+			targetPos.scl(VEL/targetPos.len());
+			collideCounter = 0;
+		}
+	}
+	
+	private void scrollBG(){
+		float diffX = 0;
+		float diffY = 0;
+		if(circle.x<BOUNDARY_OFFSET-RADIUS){
+			diffX = BOUNDARY_OFFSET - circle.x - RADIUS;
+			circle.x = BOUNDARY_OFFSET-RADIUS;
+			
+		}
+		else if(circle.x>800-BOUNDARY_OFFSET-RADIUS){
+			diffX = 800 - BOUNDARY_OFFSET - circle.x - RADIUS;
+			circle.x = 800-BOUNDARY_OFFSET-RADIUS;
+		}
+		if(circle.y<BOUNDARY_OFFSET-RADIUS){
+			diffY = BOUNDARY_OFFSET - circle.y - RADIUS;
+			circle.y = BOUNDARY_OFFSET-RADIUS;
+		}
+		else if (circle.y>480-BOUNDARY_OFFSET-RADIUS){
+			diffY = 480 - BOUNDARY_OFFSET - circle.y - RADIUS;
+			circle.y = 480 - BOUNDARY_OFFSET-RADIUS;
+		}
+		bg.scrollX(diffX);
+		bg.scrollY(diffY);
+	}
+	
+	protected Texture getPlayerImg(){
+		return this.circleImg;
+	}
+	
+	protected Circle getPlayerBox(){
+		return this.circle;
+	}
+	
+	protected void dispose(){
+		circleImg.dispose();
+	}*/
 }

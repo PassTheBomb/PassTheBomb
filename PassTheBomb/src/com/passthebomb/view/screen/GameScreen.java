@@ -24,6 +24,7 @@ import com.passthebomb.model.local.Player;
 import com.passthebomb.view.gui.Background;
 
 public class GameScreen implements Screen {
+	private final int[] screenSize = {1024,1024};
 	
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
@@ -90,7 +91,7 @@ public class GameScreen implements Screen {
 			
 		
 		batch = new SpriteBatch();
-		bg = Background.createBG(new Texture(Gdx.files.internal("background.png")), new Vector2(-624,-804));
+		bg = Background.createBG(new Texture(Gdx.files.internal("background.png")), new Vector2(0,0), screenSize);
 		
 		Texture[] playerTexture = new Texture[2];
 		Texture[] oppTexture = new Texture[2];
@@ -126,6 +127,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
+		camera.position.set(player.getAbsPos().x, player.getAbsPos().y, 0);
 		
 
 		posList = runnableListener.getPositionList();
@@ -151,7 +153,7 @@ public class GameScreen implements Screen {
 		// start new batch
 		batch.begin();
 		// draw in the new batch
-		batch.draw(bg.getBackgroundImg(), bg.getBackgroundPos().x, bg.getBackgroundPos().y);
+		batch.draw(bg.getBackgroundImg(), 0, 0);
 		batch.draw(player.getCharImg(), player.getCharImgX(), player.getCharImgY());
 		
 		for(int i = 0; i < 4; i++){
@@ -185,10 +187,9 @@ public class GameScreen implements Screen {
 			// update the cicle position
 			
 		}*/
-		
-		camera.position.set(player.getCharImgX(), player.getCharImgY(), 0);
-		
 		player.update();
+		
+		
 		int collidedTarget = -1;
 		for (int i = 0; i < 4; i++){
 			if (i != id){
@@ -204,7 +205,7 @@ public class GameScreen implements Screen {
 			updateCtr++;
 		}
 		else{*/
-			outputToHost.println(id+","+player.getAbsX()+","+player.getAbsY()+","+collidedTarget+","+player.getBombState());
+			outputToHost.println(id+","+player.getAbsPos().x+","+player.getAbsPos().y+","+collidedTarget+","+player.getBombState());
 			updateCtr = 0;
 		//}
 	

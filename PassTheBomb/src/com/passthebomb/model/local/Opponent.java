@@ -56,9 +56,8 @@ public class Opponent extends Character {
 
 	@Override
 	public void move(Vector3 tgtPos) {
-		setAbsPos(tgtPos.x,tgtPos.y);
-		getCharBox().x = getAbsPos().x + getBg().getBackgroundPos().x;
-		getCharBox().y = getAbsPos().y + getBg().getBackgroundPos().y;
+		getCharBox().x = tgtPos.x;
+		getCharBox().y = tgtPos.y;
 		
 	}
 
