@@ -16,7 +16,7 @@ import com.passthebomb.model.local.Screen;
 
 public class WaitScreen implements com.badlogic.gdx.Screen{
 
-	final String HOST = "192.168";
+	final String HOST = "localhost";
 	final int PORT = 5432;
 	
 	private SpriteBatch batch;
@@ -34,11 +34,12 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 			this.socket = new Socket(HOST, PORT);
 			inChannel = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("Cannot Find Server");
+			returnMain();
+			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("Cannot Establish Connection");
+			returnMain();
 		}
     }	
 	@Override
@@ -52,8 +53,8 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 			String in = inChannel.readLine();
 			numOfPlayerJoined = Integer.parseInt(in);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("Connection Error");
+			returnMain();
 		}
 		batch.begin();
 		font.draw(batch, String.valueOf(numOfPlayerJoined), 250, 250);
@@ -72,39 +73,37 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 	
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
 		ScreenManager.getInstance().dispose(Screen.WAIT);
 	}
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void resume() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		batch.dispose();
 		font.dispose();
+	}
+	
+	public void returnMain(){
+		// TODO
 	}
 
 }
