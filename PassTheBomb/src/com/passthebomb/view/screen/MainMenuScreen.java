@@ -3,6 +3,7 @@ package com.passthebomb.view.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -17,11 +18,16 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 	final private String JOIN = "Join";
 	final private String EXIT = "Exit";
 	
+	private final float TITLE_WIDTH = 256;
+	private final float TITLE_HEIGHT = 64;
+	
 	private SpriteBatch batch = null;
+	private Texture titleTexture;
 	private OrthographicCamera camera = null;	
 	private Stage stage;
 	private TextButton btnJoin;
 	private TextButton btnExit;
+	private float resizeFactor;
 	public String str = "Main";
 	
 	/**
@@ -31,19 +37,17 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 		
 		this.batch = new SpriteBatch();
 		
+		this.titleTexture = new Texture(Gdx.files.internal("title.png"));
+		
 		this.stage = new Stage();
 		Gdx.input.setInputProcessor(stage);
 		
 		Skin skin = new Skin(Gdx.files.internal("data/ui/uiskin.json"));
-		
-		float width = Gdx.graphics.getWidth();
-	    float height = Gdx.graphics.getHeight();
-	    
-	    float resizeWidth = width/800;
-	    float resizeHeight = height/480;
+	  
+	    resizeFactor = Gdx.graphics.getWidth()/800;
 		
 		this.btnJoin = new TextButton(JOIN, skin);
-		this.btnJoin.setBounds(resizeWidth*250, resizeHeight*210, resizeWidth*300, resizeHeight*60);
+		this.btnJoin.setBounds(resizeFactor*250, resizeFactor*190, resizeFactor*300, resizeFactor*60);
 		this.btnJoin.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				ScreenManager.getInstance().show(Screen.WAIT, MainMenuScreen.this);
@@ -52,7 +56,7 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 		this.stage.addActor(this.btnJoin);
 		
 		this.btnExit = new TextButton(EXIT, skin);
-		this.btnExit.setBounds(resizeWidth*250, resizeHeight*120, resizeWidth*300, resizeHeight*60);
+		this.btnExit.setBounds(resizeFactor*250, resizeFactor*100, resizeFactor*300, resizeFactor*60);
 		this.btnExit.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				Gdx.app.exit();
@@ -65,6 +69,10 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 	public void render(float delta) {
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		
+		batch.begin();
+		batch.draw(titleTexture, resizeFactor*(400-TITLE_WIDTH/2), resizeFactor*320, TITLE_WIDTH, TITLE_HEIGHT);
+		batch.end();
 		
 		stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
