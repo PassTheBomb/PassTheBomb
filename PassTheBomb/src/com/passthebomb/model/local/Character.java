@@ -10,6 +10,7 @@ import com.passthebomb.view.gui.Background;
 public abstract class Character {
 	private final float[] limits;
 	private final int RADIUS = 32;
+	private final int BOUND_OFFSET = 80;
 
 	private Vector2 absPos;
 	private Circle circle;
@@ -41,17 +42,17 @@ public abstract class Character {
 	protected abstract boolean collide(Character c);
 	
 	public void checkLimits(){
-		if (circle.x<100){
-			circle.x = 100;
+		if (circle.x<BOUND_OFFSET){
+			circle.x = BOUND_OFFSET;
 		}
-		else if (circle.x>limits[3]-100){
-			circle.x = limits[3]-100;
+		else if (circle.x>limits[3]-BOUND_OFFSET){
+			circle.x = limits[3]-BOUND_OFFSET;
 		}
-		if (circle.y<100){
-			circle.y = 100;
+		if (circle.y<BOUND_OFFSET){
+			circle.y = BOUND_OFFSET;
 		}
-		else if (circle.y>limits[0]-100){
-			circle.y = limits[0]-100;
+		else if (circle.y>limits[0]-BOUND_OFFSET){
+			circle.y = limits[0]-BOUND_OFFSET;
 		}
 	}
 	

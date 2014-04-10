@@ -145,7 +145,7 @@ public class GameScreen implements Screen {
 		
 
 		// set the clear colour to r, g, b, a
-		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
+		Gdx.gl.glClearColor(80/250, 100/250, 42/250, 1);
 		// clear screen
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		// update camera

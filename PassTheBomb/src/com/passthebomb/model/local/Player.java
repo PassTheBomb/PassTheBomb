@@ -10,7 +10,7 @@ import com.passthebomb.view.gui.Background;
 public class Player extends Character {
 	private final int VEL = 30;
 	private final double DELTA_TIME = 0.17;
-	private final int BOUND_OFFSET = 100;
+	private final int BOUND_OFFSET = 10;
 	private int RADIUS = 32;
 	
 	private Vector3 tgtPos, tgtPosCpy;
