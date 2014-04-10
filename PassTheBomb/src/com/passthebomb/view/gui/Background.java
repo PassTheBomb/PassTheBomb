@@ -11,23 +11,13 @@ import com.badlogic.gdx.math.Vector2;
  */
 public class Background {
 	private static Background instance = null;
-<<<<<<< HEAD
 	private final float LEFT_LIM = 0;
 	private final float RIGHT_LIM;
 	private final float TOP_LIM;
 	private final float BOTTOM_LIM = 0;
 	
 	private Texture bgImg;
-	private Vector2 bgPos;
-	
-	private Background(Texture bgImg, Vector2 startPos, float[] bgSize){
-=======
-	private final int LEFT_LIM = 0;
-	private final int RIGHT_LIM;
-	private final int TOP_LIM;
-	private final int BOTTOM_LIM = 0;
 
-	private Texture bgImg;
 
 	/**
 	 * Hidden background constructor. Used by the static createBG call to create
@@ -40,17 +30,12 @@ public class Background {
 	 * @param bgSize
 	 *            the size of the background in pixels
 	 */
-	private Background(Texture bgImg, Vector2 startPos, int[] bgSize) {
->>>>>>> Enwei
+	private Background(Texture bgImg, Vector2 startPos, float[] bgSize) {
 		this.bgImg = bgImg;
 		this.RIGHT_LIM = bgSize[0];
 		this.TOP_LIM = bgSize[1];
 	}
-<<<<<<< HEAD
 	
-	public static Background createBG(Texture bgImg, Vector2 startPos, float[] bgSize){
-		if (instance == null){
-=======
 
 	/**
 	 * Creates one instance of the Background and returns it. If a Background
@@ -65,18 +50,12 @@ public class Background {
 	 * @return a Background instance
 	 */
 	public static Background createBG(Texture bgImg, Vector2 startPos,
-			int[] bgSize) {
+			float[] bgSize) {
 		if (instance == null) {
->>>>>>> Enwei
 			instance = new Background(bgImg, startPos, bgSize);
 		}
 		return instance;
 	}
-<<<<<<< HEAD
-	
-	public float[] getLimits(){
-		float[] output = {TOP_LIM,BOTTOM_LIM,LEFT_LIM,RIGHT_LIM};
-=======
 
 	/**
 	 * Acquire the background boundaries.
@@ -84,9 +63,8 @@ public class Background {
 	 * @return an integer array of 4 values, <top limit, bottom limit, left
 	 *         limit, and right limit> in that particular order
 	 */
-	public int[] getLimits() {
-		int[] output = { TOP_LIM, BOTTOM_LIM, LEFT_LIM, RIGHT_LIM };
->>>>>>> Enwei
+	public float[] getLimits() {
+		float[] output = { TOP_LIM, BOTTOM_LIM, LEFT_LIM, RIGHT_LIM };
 		return output;
 	}
 

@@ -13,12 +13,6 @@ import com.passthebomb.view.gui.Background;
 public class Player extends Character {
 	private final int VEL = 30;
 	private final double DELTA_TIME = 0.17;
-<<<<<<< HEAD
-	private final int BOUND_OFFSET = 10;
-	private int RADIUS = 32;
-	
-=======
->>>>>>> Enwei
 	private Vector3 tgtPos, tgtPosCpy;
 
 	private boolean isMoving;
@@ -65,8 +59,6 @@ public class Player extends Character {
 					tgtPosCpy = tgtPos.cpy();
 					getCharBox().x += tgtPosCpy.x;// * DELTA_TIME;
 					getCharBox().y += tgtPosCpy.y;// * DELTA_TIME;
-<<<<<<< HEAD
-=======
 					/*
 					 * tgtPosCpy.add(new
 					 * Vector3(-getCharBox().x,-getCharBox().y,0)); if
@@ -79,7 +71,6 @@ public class Player extends Character {
 					 * tgtPosCpy.y*DELTA_TIME; System.out.println("SLOW"); }
 					 * else{ isMoving = false; System.out.println("STOP"); }
 					 */
->>>>>>> Enwei
 				}
 
 			}

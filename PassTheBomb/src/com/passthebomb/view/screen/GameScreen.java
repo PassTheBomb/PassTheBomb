@@ -32,41 +32,28 @@ import com.passthebomb.view.gui.Background;
  * 
  */
 public class GameScreen implements Screen {
-<<<<<<< HEAD
 	private final float[] screenSize = {1024, 1024};
 	private final float PLAYER_TEXTURE_SIZE = 150f;
 	private final float JOYSTICK_TEXTURE_SIZE = 128f;
 	private final float DEFAULT_SCREEN_SIZE = 800f;
 	
-=======
-	private final int[] screenSize = { 1024, 1024 };
-
->>>>>>> Enwei
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
 	private Vector3 touchPos;
 	private Background bg;
 	private Player player;
 	private Opponent[] oppList = new Opponent[4];
-<<<<<<< HEAD
 	     
-=======
-
 	private BitmapFont font;
 	private TextBounds fontBounds;
 
->>>>>>> Enwei
 	private Touchpad touchpad;
 	private TouchpadStyle touchpadStyle;
 	private Skin touchpadSkin;
 	private Drawable touchBackground;
 	private Drawable touchKnob;
 	private Stage stage;
-<<<<<<< HEAD
-	
-=======
 
->>>>>>> Enwei
 	Socket hostSocket;
 	private PrintWriter outputToHost;
 	private WaitScreen lastScreen;
@@ -77,11 +64,9 @@ public class GameScreen implements Screen {
 
 	private Listener runnableListener;
 	private Thread listener;
-<<<<<<< HEAD
 	
 	private float resizeFactor;
 	
-=======
 
 	/**
 	 * Creates a GameScreen class. Is usually created when a game is
@@ -91,7 +76,6 @@ public class GameScreen implements Screen {
 	 *            The previous screen the application was at. Usually the
 	 *            WaitScreen.
 	 */
->>>>>>> Enwei
 	public GameScreen(com.badlogic.gdx.Screen lastScreen) {
 		this.lastScreen = (WaitScreen) lastScreen;
 		try {
@@ -124,14 +108,10 @@ public class GameScreen implements Screen {
 		id = runnableListener.getWhoAmI();
 		posList = runnableListener.getPositionList();
 		bombList = runnableListener.getBombList();
-<<<<<<< HEAD
 		
 		//Setup with first line of input.
 		resizeFactor = Gdx.graphics.getWidth()/DEFAULT_SCREEN_SIZE;	
-		
-=======
 
->>>>>>> Enwei
 		batch = new SpriteBatch();
 		if (!Gdx.files.internal("background.png").exists()) {
 			System.err.println("Cannot find background img");
@@ -184,14 +164,10 @@ public class GameScreen implements Screen {
 		touchpadStyle.background = touchBackground;
 		touchpadStyle.knob = touchKnob;
 		touchpad = new Touchpad(10, touchpadStyle);
-<<<<<<< HEAD
+		
 		touchpad.setBounds(15, 15, JOYSTICK_TEXTURE_SIZE*resizeFactor, JOYSTICK_TEXTURE_SIZE*resizeFactor);
 		stage = new Stage(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),true, batch);
-=======
-		touchpad.setBounds(15, 15, 200, 200);
-		stage = new Stage(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),
-				true, batch);
->>>>>>> Enwei
+
 		stage.addActor(touchpad);
 		Gdx.input.setInputProcessor(stage);
 		// End Setup
@@ -218,56 +194,33 @@ public class GameScreen implements Screen {
 		}
 		player.setBomb(bombList[id]);
 
-<<<<<<< HEAD
-		// set the clear colour to r, g, b, a
-		Gdx.gl.glClearColor(80/250, 100/250, 42/250, 1);
-		// clear screen
-=======
 		// Start drawing things to render
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
->>>>>>> Enwei
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		camera.update();
 
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		batch.draw(bg.getBackgroundImg(), 0, 0);
-<<<<<<< HEAD
-		batch.draw(player.getCharImg(), player.getCharImgX(), player.getCharImgY(), PLAYER_TEXTURE_SIZE*resizeFactor, PLAYER_TEXTURE_SIZE*resizeFactor);
 		
-		for(int i = 0; i < 4; i++){
-			if (i != id){
-				batch.draw(oppList[i].getCharImg(), oppList[i].getCharImgX(), oppList[i].getCharImgY(), PLAYER_TEXTURE_SIZE*resizeFactor, PLAYER_TEXTURE_SIZE*resizeFactor);
-=======
 		if (player.isAlive()) {
 			fontBounds = font.getBounds("Player");
 			font.draw(batch, "Player", player.getAbsPos().x - fontBounds.width
 					/ 2, player.getAbsPos().y + 50);
 			batch.draw(player.getCharImg(), player.getCharImgX(),
-					player.getCharImgY());
+					player.getCharImgY(), PLAYER_TEXTURE_SIZE*resizeFactor, PLAYER_TEXTURE_SIZE*resizeFactor);
 		}
 
 		for (int i = 0; i < 4; i++) {
 			if (i != id && oppList[i].isAlive()) {
-				batch.draw(oppList[i].getCharImg(), oppList[i].getCharImgX(),
-						oppList[i].getCharImgY());
+				batch.draw(oppList[i].getCharImg(), oppList[i].getCharImgX(), oppList[i].getCharImgY(), PLAYER_TEXTURE_SIZE*resizeFactor, PLAYER_TEXTURE_SIZE*resizeFactor);
 				fontBounds = font.getBounds(String.valueOf(i + 1));
 				font.draw(batch, String.valueOf(i + 1),
 						oppList[i].getAbsPos().x - fontBounds.width / 2,
 						oppList[i].getAbsPos().y + 50);
->>>>>>> Enwei
 			}
 		}
 		batch.end();
-<<<<<<< HEAD
-		
-		stage.act(Gdx.graphics.getDeltaTime());	    
-	    stage.draw();
-	    
-	    touchPos = new Vector3(touchpad.getKnobPercentX()*10, touchpad.getKnobPercentY()*10, 0);
-		player.move(touchPos);
-		
-=======
 
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
@@ -276,7 +229,6 @@ public class GameScreen implements Screen {
 		touchPos = new Vector3(touchpad.getKnobPercentX() * 10,
 				touchpad.getKnobPercentY() * 10, 0);
 		player.move(touchPos);
->>>>>>> Enwei
 		player.update();
 
 		int collidedTarget = -1;
@@ -287,19 +239,11 @@ public class GameScreen implements Screen {
 				}
 			}
 		}
-<<<<<<< HEAD
-		
-		
-		outputToHost.println(id+","+player.getAbsPos().x+","+player.getAbsPos().y+","+collidedTarget+","+player.getBombState());
-		updateCtr = 0;
-	
-=======
 
 		// Transmit player data to server
 		outputToHost.println(id + "," + player.getAbsPos().x + ","
 				+ player.getAbsPos().y + "," + collidedTarget + ","
 				+ player.getBombState());
->>>>>>> Enwei
 
 	}
 

@@ -12,10 +12,6 @@ import com.passthebomb.view.gui.Background;
  * 
  */
 public abstract class Character {
-<<<<<<< HEAD
-	private final float[] limits;
-=======
->>>>>>> Enwei
 	private final int RADIUS = 32;
 	private final int BOUND_OFFSET = 80;
 
@@ -72,21 +68,7 @@ public abstract class Character {
 	 * @return did this player and the other character collide?
 	 */
 	protected abstract boolean collide(Character c);
-<<<<<<< HEAD
 	
-	public void checkLimits(){
-		if (circle.x<BOUND_OFFSET){
-			circle.x = BOUND_OFFSET;
-		}
-		else if (circle.x>limits[3]-BOUND_OFFSET){
-			circle.x = limits[3]-BOUND_OFFSET;
-		}
-		if (circle.y<BOUND_OFFSET){
-			circle.y = BOUND_OFFSET;
-		}
-		else if (circle.y>limits[0]-BOUND_OFFSET){
-			circle.y = limits[0]-BOUND_OFFSET;
-=======
 
 	/**
 	 * Checks if the character has exceeded background limits, and places it
@@ -94,16 +76,15 @@ public abstract class Character {
 	 * 
 	 */
 	public void checkLimits() {
-		if (hitBox.x < 100) {
-			hitBox.x = 100;
-		} else if (hitBox.x > bg.getLimits()[3] - 100) {
-			hitBox.x = bg.getLimits()[3] - 100;
+		if (hitBox.x < BOUND_OFFSET) {
+			hitBox.x = BOUND_OFFSET;
+		} else if (hitBox.x > bg.getLimits()[3] - BOUND_OFFSET) {
+			hitBox.x = bg.getLimits()[3] - BOUND_OFFSET;
 		}
-		if (hitBox.y < 100) {
-			hitBox.y = 100;
-		} else if (hitBox.y > bg.getLimits()[0] - 100) {
-			hitBox.y = bg.getLimits()[0] - 100;
->>>>>>> Enwei
+		if (hitBox.y < BOUND_OFFSET) {
+			hitBox.y = BOUND_OFFSET;
+		} else if (hitBox.y > bg.getLimits()[0] - BOUND_OFFSET) {
+			hitBox.y = bg.getLimits()[0] - BOUND_OFFSET;
 		}
 	}
 
