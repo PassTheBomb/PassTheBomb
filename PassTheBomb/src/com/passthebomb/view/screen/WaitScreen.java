@@ -17,7 +17,7 @@ import com.passthebomb.model.local.Screen;
 
 public class WaitScreen implements com.badlogic.gdx.Screen{
 
-	final String HOST = "192.168.83.31";
+	final String HOST = "localhost";
 	final int PORT = 5432;
 	
 	private final float TITLE_WIDTH = 256;
@@ -65,8 +65,10 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 			e.printStackTrace();
 		}
 		
+		String printString = "Number of player joined: " + numOfPlayerJoined;
+		
 		batch.draw(titleTexture, resizeFactor*(400-TITLE_WIDTH/2), resizeFactor*320, TITLE_WIDTH, TITLE_HEIGHT);
-		font.draw(batch, String.valueOf(numOfPlayerJoined), 250, 250);
+		font.draw(batch, printString, 250, 250);
 		
 		batch.end();
 		if(numOfPlayerJoined == 4) {

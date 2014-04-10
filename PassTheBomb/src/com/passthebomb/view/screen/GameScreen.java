@@ -26,7 +26,7 @@ import com.passthebomb.view.gui.Background;
 public class GameScreen implements Screen {
 	private final float[] screenSize = {1024, 1024};
 	private final float PLAYER_TEXTURE_SIZE = 150f;
-	private final float JOYSTICK_TEXTURE_SIZE = 256f;
+	private final float JOYSTICK_TEXTURE_SIZE = 128f;
 	private final float DEFAULT_SCREEN_SIZE = 800f;
 	
 	private OrthographicCamera camera;
@@ -35,7 +35,7 @@ public class GameScreen implements Screen {
 	private Background bg;
 	private Player player;
 	private Opponent[] oppList = new Opponent[4];
-	
+	     
 	private Touchpad touchpad;
 	private TouchpadStyle touchpadStyle;
 	private Skin touchpadSkin;
