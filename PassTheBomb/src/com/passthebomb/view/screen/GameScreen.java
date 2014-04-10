@@ -24,7 +24,10 @@ import com.passthebomb.model.local.Player;
 import com.passthebomb.view.gui.Background;
 
 public class GameScreen implements Screen {
-	private final int[] screenSize = {1024,1024};
+	private final float[] screenSize = {1024, 1024};
+	private final float PLAYER_TEXTURE_SIZE = 150f;
+	private final float JOYSTICK_TEXTURE_SIZE = 256f;
+	private final float DEFAULT_SCREEN_SIZE = 800f;
 	
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
@@ -40,9 +43,6 @@ public class GameScreen implements Screen {
 	private Drawable touchKnob;
 	private Stage stage;
 	
-	volatile static String HOST = "192.168.82.9"; // MODIFY THIS FIELD AS REQUIRED.
-	static final int PORT = 5432;
-
 	Socket hostSocket;
 	private PrintWriter outputToHost;
 	private BufferedReader inputFromHost;
@@ -59,6 +59,8 @@ public class GameScreen implements Screen {
 
 	private Listener runnableListener;
 	private Thread listener;
+	
+	private float resizeFactor;
 	
 	public GameScreen(com.badlogic.gdx.Screen lastScreen) {
 		this.lastScreen = (WaitScreen)lastScreen;
@@ -88,7 +90,7 @@ public class GameScreen implements Screen {
 		bombList = runnableListener.getBombList();
 		
 		//Setup with first line of input.
-			
+		resizeFactor = Gdx.graphics.getWidth()/DEFAULT_SCREEN_SIZE;	
 		
 		batch = new SpriteBatch();
 		bg = Background.createBG(new Texture(Gdx.files.internal("background.png")), new Vector2(0,0), screenSize);
@@ -119,7 +121,7 @@ public class GameScreen implements Screen {
 		touchpadStyle.background = touchBackground;
 		touchpadStyle.knob = touchKnob;
 		touchpad = new Touchpad(10, touchpadStyle);
-		touchpad.setBounds(15, 15, 200, 200);
+		touchpad.setBounds(15, 15, JOYSTICK_TEXTURE_SIZE*resizeFactor, JOYSTICK_TEXTURE_SIZE*resizeFactor);
 		stage = new Stage(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),true, batch);
 		stage.addActor(touchpad);
 		Gdx.input.setInputProcessor(stage);
@@ -154,11 +156,11 @@ public class GameScreen implements Screen {
 		batch.begin();
 		// draw in the new batch
 		batch.draw(bg.getBackgroundImg(), 0, 0);
-		batch.draw(player.getCharImg(), player.getCharImgX(), player.getCharImgY());
+		batch.draw(player.getCharImg(), player.getCharImgX(), player.getCharImgY(), PLAYER_TEXTURE_SIZE*resizeFactor, PLAYER_TEXTURE_SIZE*resizeFactor);
 		
 		for(int i = 0; i < 4; i++){
 			if (i != id){
-				batch.draw(oppList[i].getCharImg(), oppList[i].getCharImgX(), oppList[i].getCharImgY());
+				batch.draw(oppList[i].getCharImg(), oppList[i].getCharImgX(), oppList[i].getCharImgY(), PLAYER_TEXTURE_SIZE*resizeFactor, PLAYER_TEXTURE_SIZE*resizeFactor);
 			}
 		}
 		// end batch. **Note, all image rendering updates should go between
@@ -168,25 +170,9 @@ public class GameScreen implements Screen {
 		stage.act(Gdx.graphics.getDeltaTime());	    
 	    stage.draw();
 	    
-	    
 	    touchPos = new Vector3(touchpad.getKnobPercentX()*10, touchpad.getKnobPercentY()*10, 0);
-		System.out.println("X: "+touchpad.getKnobPercentX());
-		System.out.println("Y: "+touchpad.getKnobPercentY());
-		System.out.println("Moving (GameScreen) X: "+(touchPos.x)+" Y:"+(touchPos.y));
-		// change position from global coordinates to camera coordinates
-		//camera.translate(x, y);
 		player.move(touchPos);
 		
-		/*// acquire touch input
-		if (Gdx.input.isTouched()) {
-			// acquire touch position
-			touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-			// change position from global coordinates to camera coordinates
-			camera.unproject(touchPos);
-			player.move(touchPos);
-			// update the cicle position
-			
-		}*/
 		player.update();
 		
 		
@@ -200,14 +186,8 @@ public class GameScreen implements Screen {
 		}
 		
 		
-		//compile message to send to server;
-		/*if (updateCtr < 2){
-			updateCtr++;
-		}
-		else{*/
-			outputToHost.println(id+","+player.getAbsPos().x+","+player.getAbsPos().y+","+collidedTarget+","+player.getBombState());
-			updateCtr = 0;
-		//}
+		outputToHost.println(id+","+player.getAbsPos().x+","+player.getAbsPos().y+","+collidedTarget+","+player.getBombState());
+		updateCtr = 0;
 	
 
 	}

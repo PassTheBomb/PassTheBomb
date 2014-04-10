@@ -16,7 +16,7 @@ import com.passthebomb.model.local.Screen;
 
 public class WaitScreen implements com.badlogic.gdx.Screen{
 
-	final String HOST = "192.168.83.26";
+	final String HOST = "192.168.83.31";
 	final int PORT = 5432;
 	
 	private SpriteBatch batch;

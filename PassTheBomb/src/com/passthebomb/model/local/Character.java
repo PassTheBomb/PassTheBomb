@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.passthebomb.view.gui.Background;
 
 public abstract class Character {
-	private final int[] limits;
+	private final float[] limits;
 	private final int RADIUS = 32;
 
 	private Vector2 absPos;

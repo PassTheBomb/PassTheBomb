@@ -46,22 +46,6 @@ public class Player extends Character {
 					tgtPosCpy = tgtPos.cpy();
 					getCharBox().x += tgtPosCpy.x;// * DELTA_TIME;
 					getCharBox().y += tgtPosCpy.y;// * DELTA_TIME;
-					/*tgtPosCpy.add(new Vector3(-getCharBox().x,-getCharBox().y,0));
-					if (tgtPosCpy.len()> VEL){
-						tgtPosCpy.scl(VEL/tgtPosCpy.len());
-						getCharBox().x += tgtPosCpy.x * DELTA_TIME;
-						getCharBox().y += tgtPosCpy.y * DELTA_TIME;
-						System.out.println("RUN");
-					}
-					else if (tgtPosCpy.len()> 0.1){
-						getCharBox().x += tgtPosCpy.x*DELTA_TIME;
-						getCharBox().y += tgtPosCpy.y*DELTA_TIME;
-						System.out.println("SLOW");
-					}
-					else{
-						isMoving = false;
-						System.out.println("STOP");
-					}*/
 				}
 				
 			}
@@ -76,8 +60,6 @@ public class Player extends Character {
 					collide = false;
 				}
 			}
-			//this.updateAbsPos();
-			//this.scrollBG();
 			checkLimits();
 		}
 		
