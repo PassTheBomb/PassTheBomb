@@ -47,8 +47,10 @@ public class GameScreen implements Screen {
 
 	volatile static String HOST = "192.168.1.132"; // MODIFY THIS FIELD AS REQUIRED.
 	static final int PORT = 5432;
+	static final int UDP_PORT_IN = 5556;
+	static final int UDP_PORT_OUT = 5555;
 
-	DatagramSocket udpSocket;
+	DatagramSocket udpSocket, udpSocketIn;
 	Socket hostSocket;
 	private PrintWriter outputToHost;
 	private BufferedReader inputFromHost;
@@ -70,14 +72,19 @@ public class GameScreen implements Screen {
 		this.lastScreen = (WaitScreen)lastScreen;
 		try {
 			// Set up connections and i/o streams.
-			udpSocket = new DatagramSocket(PORT);
+			//System.out.println("1");
+			udpSocket = new DatagramSocket(UDP_PORT_OUT);
+			udpSocketIn = new DatagramSocket(UDP_PORT_IN);
+			//System.out.println("2");
 			hostSocket = this.lastScreen.getSocket();
+			//System.out.println("3");
 			outputToHost = new PrintWriter(hostSocket.getOutputStream(), true);
+			//System.out.println("4");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		runnableListener = new Listener(this.lastScreen.getSocket(), this);
+		runnableListener = new Listener(this.lastScreen.getSocket(), udpSocketIn, this);
 		listener = new Thread(runnableListener);
 		listener.start();
 
@@ -217,13 +224,15 @@ public class GameScreen implements Screen {
 		String output = id+","+player.getAbsPos().x+","+player.getAbsPos().y
 						+","+collidedTarget+","+player.getBombState();
 		try {
+			System.out.println("ATTEMPT TO SEND: "+output);
 			byte[] outputBuffer = output.getBytes("UTF8");
 			udpSocket.send(
 					new DatagramPacket(
 							outputBuffer, 
 							outputBuffer.length, 
-							InetAddress.getByName(GameScreen.HOST), 
-							GameScreen.PORT));
+							InetAddress.getByName(WaitScreen.HOST), 
+							GameScreen.UDP_PORT_OUT));
+			System.out.println("SENT");
 		} catch (Exception e) { 
 			System.out.println(e);
 		}
@@ -289,12 +298,12 @@ class Listener implements Runnable {
 
 	private GameScreen mainThread;
 
-	public Listener(Socket socket, GameScreen mainThread) {
-		this.socket = socket;
+	public Listener(Socket TCPsocket, DatagramSocket UDPsocket, GameScreen mainThread) {
+		this.socket = TCPsocket;
 		this.mainThread = mainThread;
+		this.UDPSocket = UDPsocket;
 
 		try {
-			UDPSocket = new DatagramSocket(GameScreen.PORT);
 			UDPSocket.setSoTimeout(1000);
 		} catch (SocketException e) {
 			System.out.println(e);
@@ -309,7 +318,7 @@ class Listener implements Runnable {
 					new InputStreamReader(socket.getInputStream()));
 			outputToHost = new PrintWriter(socket.getOutputStream(),true);
 		} catch (IOException e) {
-			System.out.println(e);
+			System.out.println("Unable to acquire initialization info");
 		}
 		
 		outputToHost.println("ready");
@@ -340,17 +349,48 @@ class Listener implements Runnable {
 
 		while(true) {
 			try {
+				//System.out.println("1");
 				// Get UDP input from server, if any.
 				byte[] buf = new byte[256];
+				//System.out.println("2");
 				DatagramPacket packet = new DatagramPacket(buf, buf.length);
+				packet.setPort(GameScreen.UDP_PORT_IN);
+				//System.out.println("2a");
+				//System.out.println("PORT: "+packet.getPort());
+				//System.out.println("2b");
+				//System.out.println("ADDRESS: "+packet.getSocketAddress());
+				//System.out.println("2c");
+				//System.out.println("ADDRESS: "+packet.getData().toString());
+				//System.out.println("3");
 
 				try {
+					//System.out.println("4");
 					UDPSocket.receive(packet); // Blocks for the specified socket timeout.
+
+					//System.out.println("5");
+					String input = new String(buf, "UTF8");
+					if (input.equals(null)){
+						System.out.println("UDP packet empty");
+					}
+					String[] passedInfo = input.split(",");
+
+					/*for (int i = 0; i < passedInfo.length; i++) {
+							System.out.println(passedInfo[i]);
+						}*/
+					int player = Integer.parseInt(passedInfo[0]);
+					float x = Float.parseFloat(passedInfo[1]);
+					float y = Float.parseFloat(passedInfo[2]);
+					positionList[player] = new Vector3(x,y,0);
+					bombList[player] = Boolean.parseBoolean(passedInfo[3]);
 				} catch (SocketTimeoutException e) {
 					
 					// If no UDP packets are received with the timeout period, check for any TCP packet.
 					if (inputFromHost.ready()) {
-						if (inputFromHost.readLine().equals("Exploded")) {
+						String in = inputFromHost.readLine();
+						if (in.equals(null)){
+							System.out.println("TCP packet empty");
+						}
+						if (in.equals("Exploded")) {
 							
 							// Close connections.
 							inputFromHost.close();
@@ -368,21 +408,12 @@ class Listener implements Runnable {
 					}
 				}
 
-				String input = new String(buf, "UTF8");
-				String[] passedInfo = input.split(",");
-
-				/*for (int i = 0; i < passedInfo.length; i++) {
-						System.out.println(passedInfo[i]);
-					}*/
-				int player = Integer.parseInt(passedInfo[0]);
-				float x = Float.parseFloat(passedInfo[1]);
-				float y = Float.parseFloat(passedInfo[2]);
-				positionList[player] = new Vector3(x,y,0);
-				bombList[player] = Boolean.parseBoolean(passedInfo[3]);;
+				
 			} 
 			
 			catch (Exception e) {
-				System.out.println(e);
+				//System.out.println(e);
+				//System.out.println("Unable to acquire game info");
 			}
 		}
 

@@ -22,6 +22,7 @@ public class Server {
 
 	static final int PLAYERS_PER_GAME = 4;
 	static final int PORT = 5432;
+	final static int UDP_PORT = 5555;
 
 	static int game_no = 0; // For each new game created, the ocunt increases by 1.
 
@@ -129,7 +130,7 @@ class ClientManager implements Runnable {
 
 	public ClientManager(LinkedList<Socket> clients, LinkedList<String> ipAddresses, int game_no) {
 		try {
-			udpSocket = new DatagramSocket(Server.PORT);
+			udpSocket = new DatagramSocket(Server.UDP_PORT);
 		} catch (SocketException e1) {
 			e1.printStackTrace();
 		}
@@ -272,7 +273,7 @@ class UDP_Listener extends Thread {
 
 	UDP_Listener() {
 		try {
-			socket = new DatagramSocket(Server.PORT);
+			socket = new DatagramSocket(Server.UDP_PORT);
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
