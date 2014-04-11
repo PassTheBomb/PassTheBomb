@@ -21,7 +21,8 @@ import java.util.Random;
 public class Server {
 
 	static final int PLAYERS_PER_GAME = 4;
-	static final int PORT = 5432;
+	static final int TCP_PORT = 5432;
+	static final int UDP_PORT = 5555;
 
 	static int game_no = 0; // For each new game created, the ocunt increases by 1.
 
@@ -31,14 +32,18 @@ public class Server {
 
 	volatile static LinkedList<ClientManager> managers;
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 
 		activeConnections = new LinkedList<String>();
 		managers = new LinkedList<ClientManager>();
 
 		// Suppress warning that serverSocket is never closed.
 		@SuppressWarnings("resource") 
-		ServerSocket serverSocket = new ServerSocket(PORT);
+		try {
+		ServerSocket serverSocket = new ServerSocket(TCP_PORT);
+		} catch (Exception e) {
+			System.out.println("Exception in TCP Port.");
+		}
 		LinkedList<Socket> clientSockets = new LinkedList<Socket>();
 		ArrayList<PrintWriter> outArrayList = new ArrayList<PrintWriter>();
 		
@@ -55,6 +60,7 @@ public class Server {
 		 * Server thread continues to run and listens for new connections.
 		 */
 		while (true) {
+			System.out.println("Waiting for connection..");
 			Socket socket = serverSocket.accept();
 			clientSockets.add(socket);
 			outArrayList.add(new PrintWriter(socket.getOutputStream(), true));
@@ -115,7 +121,7 @@ class ClientManager implements Runnable {
 	// udpBuffer is not synchronized for performance reasons;
 	// packet loss is not a big deal, which is why we use UDP in the first place.
 	private DatagramSocket udpSocket;
-	private volatile byte[] udpBuffer;			// UDP - frequent game updates over UDP.
+	private volatile String inputString; // From UDP
 	private LinkedList<String> ipAddresses;
 	private LinkedList<Socket> clientSockets; 	// TCP - important messages over TCP only.
 	private LinkedList<BufferedReader> inputFromClients;
@@ -129,11 +135,11 @@ class ClientManager implements Runnable {
 
 	public ClientManager(LinkedList<Socket> clients, LinkedList<String> ipAddresses, int game_no) {
 		try {
-			udpSocket = new DatagramSocket(Server.PORT);
+			udpSocket = new DatagramSocket(Server.UDP_PORT);
 		} catch (SocketException e1) {
 			e1.printStackTrace();
 		}
-		udpBuffer = null;
+		inputString = "";
 		this.ipAddresses = ipAddresses;
 		clientSockets = clients;
 		inputFromClients = new LinkedList<BufferedReader>();
@@ -166,8 +172,8 @@ class ClientManager implements Runnable {
 	/**
 	 * Sets the buffer attribute in the ClientManager class.
 	 */
-	public void set(byte[] buf) {
-		udpBuffer = buf;
+	public void set(String str) {
+		inputString = str;
 	}	
 
 	@Override
@@ -188,6 +194,8 @@ class ClientManager implements Runnable {
 
 				String initInfo = i + ";0,312,512," + bombList[0] + ";1,412,512," + bombList[1] + ";2,712,512," + bombList[2] + ";3,612,512," + bombList[3];
 				outputToClients.get(i).println(initInfo);
+				
+				System.out.println(initInfo + " to client " + i);
 			}
 
 			long startTime = System.currentTimeMillis();
@@ -195,12 +203,10 @@ class ClientManager implements Runnable {
 			// Receive client information and update all clients constantly.
 			// Uses UDP for performance reasons.
 			while (true) {
-				if (udpBuffer != null) { // Extract the stuff from the buffer.
-					String in = new String(udpBuffer, "UTF8");
-					udpBuffer = null; 
-					System.out.println(in);
+				if (!inputString.equals("")) { // Extract the stuff from the buffer.
+					inputString = ""; 
 
-					String input[] = in.split(",");
+					String input[] = inputString.split(",");
 
 					try {
 						// Process packet information.
@@ -223,7 +229,7 @@ class ClientManager implements Runnable {
 											outputBuffer, 
 											outputBuffer.length, 
 											InetAddress.getByName(ip), 
-											Server.PORT));
+											Server.UDP_PORT));
 						}
 						
 					} catch (Exception e) { 
@@ -272,7 +278,7 @@ class UDP_Listener extends Thread {
 
 	UDP_Listener() {
 		try {
-			socket = new DatagramSocket(Server.PORT);
+			socket = new DatagramSocket(Server.UDP_PORT);
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
@@ -285,6 +291,9 @@ class UDP_Listener extends Thread {
 				byte[] buf = new byte[256];
 				DatagramPacket packet = new DatagramPacket(buf, buf.length);
 				socket.receive(packet); // Blocks till packet is received.
+				
+				String received = new String(buf, "UTF8");
+				System.out.println(received);
 
 				String clientIP = packet.getAddress().toString();
 				
@@ -295,8 +304,8 @@ class UDP_Listener extends Thread {
 				int globalClientNo = Server.activeConnections.indexOf(clientIP);
 				int game_no = (globalClientNo) / Server.PLAYERS_PER_GAME; // integer division
 
-				// Give the packet data (stored in the buffer) to the correct client manager.
-				Server.managers.get(game_no).set(buf);
+				// Give the packet data to the correct client manager.
+				Server.managers.get(game_no).set(received);
 
 			} catch (Exception e) {
 				e.printStackTrace();
