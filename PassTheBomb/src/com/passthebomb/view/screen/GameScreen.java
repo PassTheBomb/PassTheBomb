@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad.TouchpadStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.passthebomb.controller.ScreenManager;
 import com.passthebomb.model.local.Opponent;
 import com.passthebomb.model.local.Player;
 import com.passthebomb.view.gui.Background;
@@ -292,7 +293,7 @@ public class GameScreen implements Screen {
 	 */
 	public void returnMain() {
 		Thread.currentThread().interrupt();
-		// TODO
+		ScreenManager.getInstance().show(com.passthebomb.model.local.Screen.MAIN_MENU, this);
 	}
 
 }

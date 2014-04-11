@@ -116,7 +116,7 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 	}
 	
 	public void returnMain(){
-		// TODO
+		ScreenManager.getInstance().show(Screen.MAIN_MENU, this);
 	}
 
 }
