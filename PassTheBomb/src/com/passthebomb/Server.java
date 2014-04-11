@@ -1,6 +1,7 @@
 package com.passthebomb;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.DatagramPacket;
@@ -8,7 +9,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
@@ -23,6 +23,7 @@ public class Server {
 	static final int PLAYERS_PER_GAME = 4;
 	static final int TCP_PORT = 5432;
 	static final int UDP_PORT = 5555;
+	static final int UDP_PORT_OUT = 5556;
 
 	static int game_no = 0; // For each new game created, the ocunt increases by 1.
 
@@ -32,23 +33,23 @@ public class Server {
 
 	volatile static LinkedList<ClientManager> managers;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		activeConnections = new LinkedList<String>();
 		managers = new LinkedList<ClientManager>();
 
 		// Suppress warning that serverSocket is never closed.
-		@SuppressWarnings("resource") 
-		try {
+		@SuppressWarnings("resource")
 		ServerSocket serverSocket = new ServerSocket(TCP_PORT);
-		} catch (Exception e) {
-			System.out.println("Exception in TCP Port.");
-		}
+
 		LinkedList<Socket> clientSockets = new LinkedList<Socket>();
 		ArrayList<PrintWriter> outArrayList = new ArrayList<PrintWriter>();
-		
+
+		DatagramSocket udpSocketListener = new DatagramSocket(Server.UDP_PORT);
+		DatagramSocket udpSocketSender = new DatagramSocket(Server.UDP_PORT_OUT);
+
 		// Start UDP Listener.
-		Thread udpListener = new UDP_Listener();
+		Thread udpListener = new UDP_Listener(udpSocketListener);
 		udpListener.start();
 
 		int count = 0; 
@@ -65,12 +66,13 @@ public class Server {
 			clientSockets.add(socket);
 			outArrayList.add(new PrintWriter(socket.getOutputStream(), true));
 
-			String IP = socket.getInetAddress().toString();
-			
+			String IP = socket.getInetAddress().getHostAddress();
+			System.out.println(IP);
+
 			synchronized(Server.class) {
 				activeConnections.add(IP);
 			}
-			
+
 			System.out.println(count + " p connected to game number " + game_no 
 					+ " with IP: " + IP);
 
@@ -82,19 +84,21 @@ public class Server {
 			}
 
 			if (count == PLAYERS_PER_GAME) {
-				
+
 				// Generate list of IP addresses per game.
 				LinkedList<String> ipAddresses = new LinkedList<String>();
 				for (Socket s : clientSockets) {
-					ipAddresses.add(s.getInetAddress().toString());
+					ipAddresses.add(s.getInetAddress().getHostAddress());
 				}
 
 				// Create copy of the list of client sockets.
 				LinkedList<Socket> copyOfClientSockets = new LinkedList<Socket>(clientSockets);
 
 				// Pass the clientSockets and their IPs to the clientManager, plus the game number.
-				ClientManager clientManager = new ClientManager(copyOfClientSockets, ipAddresses, game_no);
-				managers.add(clientManager);
+				ClientManager clientManager = new ClientManager(copyOfClientSockets, ipAddresses, game_no, udpSocketSender);
+
+				managers.add(clientManager); // Add to list of managers.
+
 				Thread clientManagerThread = new Thread(clientManager);
 				System.out.println("Manager thread created.");
 				clientManagerThread.start();
@@ -133,12 +137,9 @@ class ClientManager implements Runnable {
 	private int bombHolder;
 	private boolean[] bombList;
 
-	public ClientManager(LinkedList<Socket> clients, LinkedList<String> ipAddresses, int game_no) {
-		try {
-			udpSocket = new DatagramSocket(Server.UDP_PORT);
-		} catch (SocketException e1) {
-			e1.printStackTrace();
-		}
+	public ClientManager(LinkedList<Socket> clients, LinkedList<String> ipAddresses, int game_no, DatagramSocket udpSocket) {
+		this.udpSocket = udpSocket;
+
 		inputString = "";
 		this.ipAddresses = ipAddresses;
 		clientSockets = clients;
@@ -168,12 +169,13 @@ class ClientManager implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Sets the buffer attribute in the ClientManager class.
 	 */
 	public void set(String str) {
 		inputString = str;
+		//System.out.println("SET SET SET SET SET");
 	}	
 
 	@Override
@@ -190,23 +192,29 @@ class ClientManager implements Runnable {
 
 			// Inform client of their id and who is the bomb holder over TCP. 
 			for (int i = 0; i < size; i++) {
+				System.out.println("Initialize " + i);
 				inputFromClients.get(i).readLine();
 
 				String initInfo = i + ";0,312,512," + bombList[0] + ";1,412,512," + bombList[1] + ";2,712,512," + bombList[2] + ";3,612,512," + bombList[3];
 				outputToClients.get(i).println(initInfo);
-				
+
 				System.out.println(initInfo + " to client " + i);
 			}
-
+			System.out.println("1");
 			long startTime = System.currentTimeMillis();
+			System.out.println("2");
 
 			// Receive client information and update all clients constantly.
 			// Uses UDP for performance reasons.
 			while (true) {
-				if (!inputString.equals("")) { // Extract the stuff from the buffer.
-					inputString = ""; 
+				// System.out.println("enter loop.");
+
+				if (!(inputString == "")) { // Extract the stuff from the buffer.
 
 					String input[] = inputString.split(",");
+
+					System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
+					//inputString = ""; 
 
 					try {
 						// Process packet information.
@@ -217,26 +225,31 @@ class ClientManager implements Runnable {
 							bombList[playerNo] = false;
 							bombList[collidedPlayerNo] = true;
 						}
-						
+
 						// Generate output string to be sent to rest of clients.
 						String output = input[0]+","+input[1]+","+input[2]+","+bombList[playerNo];
 						byte[] outputBuffer = output.getBytes("UTF8");
-						
+
 						// Transmit packet to all other clients over UDP.
-						for (String ip : ipAddresses) {
-							udpSocket.send(
-									new DatagramPacket(
-											outputBuffer, 
-											outputBuffer.length, 
-											InetAddress.getByName(ip), 
-											Server.UDP_PORT));
+						try {
+							for (String ip : ipAddresses) {
+								System.out.println(ip);
+								udpSocket.send(
+										new DatagramPacket(
+												outputBuffer, 
+												outputBuffer.length, 
+												InetAddress.getByName(ip), 
+												Server.UDP_PORT_OUT));
+							}
+						} catch (Exception e) {
+							System.out.println("Error in sending DATAGRAM PACKET." + e);
 						}
-						
+
 					} catch (Exception e) { 
-						System.out.println("Error in processing UDP packet.");
+						System.out.println("General error.");
 					}
 				}
-				
+
 				// Periodically check if bomb has expired then exit loop.
 				if (System.currentTimeMillis() - startTime >= bombTimer) {
 					System.out.println("Bomb Exploded.");
@@ -262,7 +275,7 @@ class ClientManager implements Runnable {
 					// the UDP Listener will not re-use them.
 					Server.activeConnections.set(index+i, "gameover"); 
 				}
-				
+
 			}
 
 		} catch (Exception e) {
@@ -276,12 +289,9 @@ class UDP_Listener extends Thread {
 
 	DatagramSocket socket;
 
-	UDP_Listener() {
-		try {
-			socket = new DatagramSocket(Server.UDP_PORT);
-		} catch (SocketException e) {
-			e.printStackTrace();
-		}
+	UDP_Listener(DatagramSocket socket) {
+		this.socket = socket;
+
 	}
 
 	@Override
@@ -291,18 +301,20 @@ class UDP_Listener extends Thread {
 				byte[] buf = new byte[256];
 				DatagramPacket packet = new DatagramPacket(buf, buf.length);
 				socket.receive(packet); // Blocks till packet is received.
-				
+
 				String received = new String(buf, "UTF8");
-				System.out.println(received);
+				//System.out.println(received);
 
 				String clientIP = packet.getAddress().toString();
-				
+
 				/* Using the IP of the packet, determine the global client number
 				 * and hence determine the game number, so that we can "re-direct"
 				 * the packet to the correct game out of the many games running. */
-				
+
 				int globalClientNo = Server.activeConnections.indexOf(clientIP);
 				int game_no = (globalClientNo) / Server.PLAYERS_PER_GAME; // integer division
+
+				//System.out.println("Game number: " + game_no);
 
 				// Give the packet data to the correct client manager.
 				Server.managers.get(game_no).set(received);
