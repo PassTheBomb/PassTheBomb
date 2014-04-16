@@ -138,7 +138,7 @@ class ClientManager implements Runnable {
 						/* Receive: 
 						 * 	"id, x_coordinate, y_coordinate, bomb_from, bomb_to" */
 						String in = inputFromClients.get(i).readLine();
-						System.out.println(in);
+						//System.out.println(in);
 						String input[] = in.split(",");
 						
 						

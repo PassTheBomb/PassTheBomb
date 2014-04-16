@@ -1,6 +1,6 @@
 package com.passthebomb.model.local;
 
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -26,7 +26,7 @@ public class Player extends Character {
 	 * 
 	 * @param absStartPos
 	 *            The player's starting position.
-	 * @param imgSet
+	 * @param playerTexture
 	 *            The player's image set, consisting of one without a bomb and
 	 *            one with a bomb
 	 * @param bomb
@@ -34,9 +34,9 @@ public class Player extends Character {
 	 * @param bg
 	 *            The background the player is using
 	 */
-	public Player(Vector2 absStartPos, Texture[] imgSet, boolean bomb,
+	public Player(Vector2 absStartPos, Sprite[] playerTexture, boolean bomb,
 			Background bg) {
-		super(absStartPos, imgSet, bomb, bg);
+		super(absStartPos, playerTexture, bomb, bg);
 		isMoving = false;
 		collide = false;
 		collideCtr = 0;

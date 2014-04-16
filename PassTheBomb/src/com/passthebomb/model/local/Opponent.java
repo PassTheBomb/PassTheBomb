@@ -1,6 +1,6 @@
 package com.passthebomb.model.local;
 
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.passthebomb.view.gui.Background;
@@ -17,7 +17,7 @@ public class Opponent extends Character {
 	 * 
 	 * @param absStartPos
 	 *            The opponent starting position.
-	 * @param imgSet
+	 * @param oppTexture
 	 *            The opponent image set consisting of one without a bomb and
 	 *            one with a bomb.
 	 * @param bomb
@@ -25,9 +25,9 @@ public class Opponent extends Character {
 	 * @param bg
 	 *            The background the opponent is using.
 	 */
-	public Opponent(Vector2 absStartPos, Texture[] imgSet, boolean bomb,
+	public Opponent(Vector2 absStartPos, Sprite[] oppTexture, boolean bomb,
 			Background bg) {
-		super(absStartPos, imgSet, bomb, bg);
+		super(absStartPos, oppTexture, bomb, bg);
 	}
 
 	@Override

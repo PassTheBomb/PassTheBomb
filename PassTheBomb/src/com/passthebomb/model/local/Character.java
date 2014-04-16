@@ -1,6 +1,6 @@
 package com.passthebomb.model.local;
 
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -16,7 +16,7 @@ public abstract class Character {
 	private final int BOUND_OFFSET = 80;
 
 	private Circle hitBox;
-	private Texture[] imgSet;
+	private Sprite[] imgSet;
 	private Background bg;
 
 	private boolean carryingBomb;
@@ -29,17 +29,17 @@ public abstract class Character {
 	 * @param absStartPos
 	 *            The starting position of the character. Reference point is at
 	 *            the centre of the character circle.
-	 * @param imgSet
+	 * @param playerTexture
 	 *            The image set of the character, without and with the bomb
 	 * @param bomb
 	 *            Is the character holding the bomb?
 	 * @param bg
 	 *            The background that the character will be playing on
 	 */
-	protected Character(Vector2 absStartPos, Texture[] imgSet, boolean bomb,
+	protected Character(Vector2 absStartPos, Sprite[] playerTexture, boolean bomb,
 			Background bg) {
 		this.hitBox = new Circle(absStartPos, RADIUS);
-		this.imgSet = imgSet;
+		this.imgSet = playerTexture;
 		this.carryingBomb = bomb;
 		this.bg = bg;
 		this.alive = true;
@@ -102,7 +102,7 @@ public abstract class Character {
 	 * 
 	 * @return character image corresponding to its current bomb state
 	 */
-	public Texture getCharImg() {
+	public Sprite getCharImg() {
 		if (carryingBomb) {
 			return imgSet[1];
 		} else {
@@ -135,8 +135,6 @@ public abstract class Character {
 	 * 
 	 */
 	public void dispose() {
-		imgSet[0].dispose();
-		imgSet[1].dispose();
 	}
 
 	/**

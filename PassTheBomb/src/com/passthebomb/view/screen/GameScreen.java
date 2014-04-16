@@ -13,8 +13,10 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -22,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad.TouchpadStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Array;
 import com.passthebomb.controller.ScreenManager;
 import com.passthebomb.model.local.Opponent;
 import com.passthebomb.model.local.Player;
@@ -47,6 +50,10 @@ public class GameScreen implements Screen {
 	     
 	private BitmapFont font;
 	private TextBounds fontBounds;
+	private TextureAtlas imgpack;
+	private Array<Sprite> textureset;
+	private Sprite[] playerTexture = new Sprite[2];
+	private Sprite[] oppTexture = new Sprite[2];
 
 	private Touchpad touchpad;
 	private TouchpadStyle touchpadStyle;
@@ -88,7 +95,6 @@ public class GameScreen implements Screen {
 					.println("Connection Error. Cannot establish server updater.");
 			returnMain();
 		}
-
 		// Set up Listener thread to constantly listen for server broadcasts.
 		runnableListener = new Listener(this.lastScreen.getSocket(), this);
 		listener = new Thread(runnableListener);
@@ -122,25 +128,31 @@ public class GameScreen implements Screen {
 					new Texture(Gdx.files.internal("background.png")),
 					new Vector2(0, 0), screenSize);
 		}
-
-		Texture[] playerTexture = new Texture[2];
-		Texture[] oppTexture = new Texture[2];
-
-		if (!Gdx.files.internal("player_r.png").exists()
-				|| !Gdx.files.internal("player_rb.png").exists()) {
+		if (!Gdx.files.internal("player_r_s.png").exists()){
+			System.err.println("Cannot find img");
+		} else {
+			imgpack = new TextureAtlas(Gdx.files.internal("imgpack.txt"));
+			textureset = imgpack.createSprites();
+		}
+		oppTexture[0] = textureset.get(0);
+		oppTexture[1] = textureset.get(1);
+		playerTexture[0] = textureset.get(2);
+		playerTexture[1] = textureset.get(3);/*
+		if (!Gdx.files.internal("player_r_s.png").exists()
+				|| !Gdx.files.internal("player_rb_s.png").exists()) {
 			System.err.println("Cannot find player img");
 		} else {
-			playerTexture[0] = new Texture(Gdx.files.internal("player_r.png"));
-			playerTexture[1] = new Texture(Gdx.files.internal("player_rb.png"));
+			playerTexture[0] = new Texture(Gdx.files.internal("player_r_s.png"));
+			playerTexture[1] = new Texture(Gdx.files.internal("player_rb_s.png"));
 		}
 
-		if (!Gdx.files.internal("opp_r.png").exists()
-				|| !Gdx.files.internal("opp_rb.png").exists()) {
+		if (!Gdx.files.internal("opp_r_s.png").exists()
+				|| !Gdx.files.internal("opp_rb_s.png").exists()) {
 			System.err.println("Cannot find opponent img");
 		} else {
-			oppTexture[0] = new Texture(Gdx.files.internal("opp_r.png"));
-			oppTexture[1] = new Texture(Gdx.files.internal("opp_rb.png"));
-		}
+			oppTexture[0] = new Texture(Gdx.files.internal("opp_r_s.png"));
+			oppTexture[1] = new Texture(Gdx.files.internal("opp_rb_s.png"));
+		}*/
 		player = new Player(new Vector2(posList[id].x, posList[id].y),
 				playerTexture, bombList[id], bg);
 
@@ -157,8 +169,8 @@ public class GameScreen implements Screen {
 		font.setColor(Color.WHITE);
 
 		touchpadSkin = new Skin();
-		touchpadSkin.add("touchBackground", new Texture("touchBackground.png"));
-		touchpadSkin.add("touchKnob", new Texture("touchKnob.png"));
+		touchpadSkin.add("touchBackground", textureset.get(4));
+		touchpadSkin.add("touchKnob", textureset.get(5));
 		touchpadStyle = new TouchpadStyle();
 		touchBackground = touchpadSkin.getDrawable("touchBackground");
 		touchKnob = touchpadSkin.getDrawable("touchKnob");
@@ -285,6 +297,7 @@ public class GameScreen implements Screen {
 			}
 		}
 		bg.dispose();
+		imgpack.dispose();
 	}
 
 	/**

@@ -1,0 +1,46 @@
+imgpack.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+opp_r_s
+  rotate: false
+  xy: 2, 2
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+opp_rb_s
+  rotate: false
+  xy: 132, 2
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+player_r_s
+  rotate: false
+  xy: 262, 2
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+player_rb_s
+  rotate: false
+  xy: 2, 132
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+touchBackground
+  rotate: false
+  xy: 132, 132
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+touchKnob
+  rotate: false
+  xy: 262, 132
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
