@@ -21,7 +21,6 @@ public class Server {
 	public static void main(String[] args) throws Exception {
 		
 		// Suppress warning that serverSocket is never closed.
-		@SuppressWarnings("resource") 
 		ServerSocket serverSocket = new ServerSocket(5432);
 		LinkedList<Socket> clientSockets = new LinkedList<Socket>();
 		ArrayList<PrintWriter> outArrayList = new ArrayList<PrintWriter>();
@@ -40,11 +39,6 @@ public class Server {
 			outArrayList.add(new PrintWriter(socket.getOutputStream(), true));
 			count++;
 			System.out.println(count + " p connected.");
-			
-			for(PrintWriter out : outArrayList) {
-				out.println(clientSockets.size());
-				System.out.println(out + ";" + count);
-			}
 
 			if (count == PLAYERS_PER_GAME) {
 
@@ -90,11 +84,10 @@ class ClientManager implements Runnable {
 		size = Server.PLAYERS_PER_GAME;
 
 		// Set bomb timer to 60sec.
-		bombTimer = 60000;
+		bombTimer = 10000;
 
 		try {
 			for (Socket s : clientSockets) {
-				System.out.println(s.isClosed());
 				inputFromClients.add(
 						new BufferedReader(
 								new InputStreamReader(s.getInputStream()) ));

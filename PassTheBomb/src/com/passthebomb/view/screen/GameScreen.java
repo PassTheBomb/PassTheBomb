@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -28,6 +27,7 @@ import com.badlogic.gdx.utils.Array;
 import com.passthebomb.controller.ScreenManager;
 import com.passthebomb.model.local.Opponent;
 import com.passthebomb.model.local.Player;
+import com.passthebomb.model.local.Screen;
 import com.passthebomb.view.gui.Background;
 
 /**
@@ -35,7 +35,7 @@ import com.passthebomb.view.gui.Background;
  * controls what is drawn and manages the update process.
  * 
  */
-public class GameScreen implements Screen {
+public class GameScreen implements com.badlogic.gdx.Screen {
 	private final float[] screenSize = {1024, 1024};
 	private final float PLAYER_TEXTURE_SIZE = 150f;
 	private final float JOYSTICK_TEXTURE_SIZE = 128f;
@@ -69,12 +69,21 @@ public class GameScreen implements Screen {
 	private int id; // Player id.
 	private Vector3[] posList;
 	private boolean[] bombList;
+	private static boolean amIWin;
 
 	private Listener runnableListener;
 	private Thread listener;
 	
 	private float resizeFactor;
 	
+	
+	public boolean isAmIWin() {
+		return amIWin;
+	}
+	
+	protected static void setAmIWin(boolean amIWin) {
+		GameScreen.amIWin = amIWin;
+	}
 
 	/**
 	 * Creates a GameScreen class. Is usually created when a game is
@@ -137,22 +146,7 @@ public class GameScreen implements Screen {
 		oppTexture[0] = textureset.get(0);
 		oppTexture[1] = textureset.get(1);
 		playerTexture[0] = textureset.get(2);
-		playerTexture[1] = textureset.get(3);/*
-		if (!Gdx.files.internal("player_r_s.png").exists()
-				|| !Gdx.files.internal("player_rb_s.png").exists()) {
-			System.err.println("Cannot find player img");
-		} else {
-			playerTexture[0] = new Texture(Gdx.files.internal("player_r_s.png"));
-			playerTexture[1] = new Texture(Gdx.files.internal("player_rb_s.png"));
-		}
-
-		if (!Gdx.files.internal("opp_r_s.png").exists()
-				|| !Gdx.files.internal("opp_rb_s.png").exists()) {
-			System.err.println("Cannot find opponent img");
-		} else {
-			oppTexture[0] = new Texture(Gdx.files.internal("opp_r_s.png"));
-			oppTexture[1] = new Texture(Gdx.files.internal("opp_rb_s.png"));
-		}*/
+		playerTexture[1] = textureset.get(3);
 		player = new Player(new Vector2(posList[id].x, posList[id].y),
 				playerTexture, bombList[id], bg);
 
@@ -274,7 +268,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void hide() {
-
+		ScreenManager.getInstance().dispose(Screen.GAME);
 	}
 
 	@Override
@@ -318,7 +312,21 @@ public class GameScreen implements Screen {
 	 */
 	public void returnMain() {
 		Thread.currentThread().interrupt();
-		ScreenManager.getInstance().show(com.passthebomb.model.local.Screen.MAIN_MENU, this);
+		
+		Gdx.app.postRunnable(new Runnable() {
+	         public void run() {
+	        	 ScreenManager.getInstance().show(Screen.MAIN_MENU, GameScreen.this);
+	         }
+		});
+	}
+	
+	public void goToCredit() {
+		Gdx.app.postRunnable(new Runnable() {
+	         public void run() {
+	        	 ScreenManager.getInstance().show(Screen.CREDITS, GameScreen.this);
+	         }
+		});
+		
 	}
 
 }
@@ -421,16 +429,19 @@ class Listener implements Runnable {
 						socket.close();
 					} else if (input.equals("Exploded")) {
 						
+						System.out.println("Exploded");
+						
 						// If I have bomb, I lose the game
 						boolean doIHaveBomb = bombList[whoAmI];
 						
 						// Change screen to credit screen to see who wins / lose. 
-						
-
-
+						GameScreen.setAmIWin(!doIHaveBomb);
+						//ScreenManager.getInstance().show(Screen.CREDITS, this.mainThread);
+						mainThread.goToCredit();
+						active = false;
 						
 					} else {
-						passedInfo = inputFromHost.readLine().split(",");
+						passedInfo = input.split(",");
 						try {
 							int player = Integer.parseInt(passedInfo[0]);
 							float x = Float.parseFloat(passedInfo[1]);
