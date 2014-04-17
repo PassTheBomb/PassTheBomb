@@ -96,7 +96,7 @@ public class GameScreen implements Screen {
 			returnMain();
 		}
 		// Set up Listener thread to constantly listen for server broadcasts.
-		runnableListener = new Listener(this.lastScreen.getSocket(), this);
+		runnableListener = new Listener(this.lastScreen.getSocket(), this, outputToHost);
 		listener = new Thread(runnableListener);
 		listener.start();
 
@@ -298,6 +298,18 @@ public class GameScreen implements Screen {
 		}
 		bg.dispose();
 		imgpack.dispose();
+
+		// Close i/o streams and sockets when disposed.
+		try {
+			runnableListener.getInputFromHost().close();
+			outputToHost.close();
+			if (!hostSocket.isClosed()) {
+				hostSocket.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	/**
@@ -341,10 +353,15 @@ class Listener implements Runnable {
 	 *            The main game thread the Listener runs from. Used to
 	 *            synchronize initial data setup
 	 */
-	public Listener(Socket socket, GameScreen mainThread) {
+	public Listener(Socket socket, GameScreen mainThread, PrintWriter outputToHost) {
 		this.socket = socket;
 		this.mainThread = mainThread;
 		this.active = true;
+		this.outputToHost = outputToHost;
+	}
+
+	public BufferedReader getInputFromHost() {
+		return inputFromHost;
 	}
 
 	@Override
@@ -353,7 +370,6 @@ class Listener implements Runnable {
 			// Establish i/o stream
 			inputFromHost = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
-			outputToHost = new PrintWriter(socket.getOutputStream(), true);
 
 			// Acquire initial setup data
 			outputToHost.println("ready");
@@ -402,6 +418,17 @@ class Listener implements Runnable {
 						System.err.println("Server terminated");
 						mainThread.returnMain();
 						active = false;
+						socket.close();
+					} else if (input.equals("Exploded")) {
+						
+						// If I have bomb, I lose the game
+						boolean doIHaveBomb = bombList[whoAmI];
+						
+						// Change screen to credit screen to see who wins / lose. 
+						
+
+
+						
 					} else {
 						passedInfo = inputFromHost.readLine().split(",");
 						try {
