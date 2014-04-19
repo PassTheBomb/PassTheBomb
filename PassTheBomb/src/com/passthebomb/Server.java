@@ -18,6 +18,7 @@ public class Server {
 
 	static final int PLAYERS_PER_GAME = 4;
 
+	@SuppressWarnings("resource")
 	public static void main(String[] args) throws Exception {
 		
 		// Suppress warning that serverSocket is never closed.
@@ -39,6 +40,10 @@ public class Server {
 			outArrayList.add(new PrintWriter(socket.getOutputStream(), true));
 			count++;
 			System.out.println(count + " p connected.");
+			
+			for(PrintWriter out : outArrayList) {
+				out.println(clientSockets.size());
+			}
 
 			if (count == PLAYERS_PER_GAME) {
 

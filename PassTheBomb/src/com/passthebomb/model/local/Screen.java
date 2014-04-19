@@ -1,11 +1,6 @@
 package com.passthebomb.model.local;
 
-import com.passthebomb.view.screen.CreditsScreen;
-import com.passthebomb.view.screen.GameScreen;
-import com.passthebomb.view.screen.IntroScreen;
-import com.passthebomb.view.screen.LobbyListScreen;
-import com.passthebomb.view.screen.MainMenuScreen;
-import com.passthebomb.view.screen.WaitScreen;
+import com.passthebomb.view.screen.*;
 
 public enum Screen {
 	INTRO {
@@ -43,10 +38,10 @@ public enum Screen {
         }
     },
     
-    LOBBY {
+    PROTOCAL {
     	@Override
         public com.badlogic.gdx.Screen getScreenInstance(com.badlogic.gdx.Screen lastScreen) {
-             return new LobbyListScreen(lastScreen);
+             return new ProtocalScreen(lastScreen);
         }
     };
  

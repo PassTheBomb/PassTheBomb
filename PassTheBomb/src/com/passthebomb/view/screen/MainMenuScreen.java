@@ -50,7 +50,7 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 		this.btnJoin.setBounds(resizeFactor*250, resizeFactor*190, resizeFactor*300, resizeFactor*60);
 		this.btnJoin.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
-				ScreenManager.getInstance().show(Screen.WAIT, MainMenuScreen.this);
+				ScreenManager.getInstance().show(Screen.PROTOCAL, MainMenuScreen.this);
 			}
 		});
 		this.stage.addActor(this.btnJoin);

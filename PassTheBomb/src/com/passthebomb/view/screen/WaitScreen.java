@@ -2,7 +2,9 @@ package com.passthebomb.view.screen;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -13,11 +15,15 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.passthebomb.controller.ScreenManager;
+import com.passthebomb.model.local.PROTOCAL;
 import com.passthebomb.model.local.Screen;
+import com.passthebomb.security.ClientAuthentication;
+import com.passthebomb.security.Keys;
+import com.passthebomb.security.Security;
 
 public class WaitScreen implements com.badlogic.gdx.Screen{
 
-	final String HOST = "localhost";
+	final String HOST = "172.16.31.45";
 	final int PORT = 5432;
 	
 	private final float TITLE_WIDTH = 256;
@@ -30,13 +36,35 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 	private BufferedReader inChannel;
 	private int numOfPlayerJoined;
 	private float resizeFactor;
+	private ProtocalScreen lastScreen;
+	private PROTOCAL protocal;
 	
 	public WaitScreen(com.badlogic.gdx.Screen lastScreen) {
+		this.lastScreen = (ProtocalScreen)lastScreen;
+		this.protocal =	this.lastScreen.chosedProtocal;
 		batch = new SpriteBatch();    
         font = new BitmapFont();
         font.setColor(Color.RED);
         numOfPlayerJoined = 1;
+        this.startSession();
         try {
+        	boolean result = this.verificaiton();
+        	if (!result) {
+        		System.out.println("Verification failed");
+				this.socket.close();
+				this.returnMain();
+			}
+		} catch (IOException e) {
+			System.err.println("Can not get input and output stream");
+			this.returnMain();
+		}
+        System.out.println("Verification passed");
+        this.titleTexture = new Texture(Gdx.files.internal("title.png"));
+        resizeFactor = Gdx.graphics.getWidth()/800;
+    }
+	
+	private void startSession() {
+		try {
 			this.socket = new Socket(HOST, PORT);
 			inChannel = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		} catch (UnknownHostException e) {
@@ -47,9 +75,32 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 			System.err.println("Cannot Establish Connection");
 			returnMain();
 		}
-        this.titleTexture = new Texture(Gdx.files.internal("title.png"));
-        resizeFactor = Gdx.graphics.getWidth()/800;
-    }	
+	}
+	
+	private boolean verificaiton() throws IOException {
+		Security s = new Security();
+		Keys k = new Keys();
+		k.generateRSAKeyPair();
+		
+		InputStream in = this.socket.getInputStream();
+		OutputStream out = this.socket.getOutputStream();
+		
+		ClientAuthentication sa = new ClientAuthentication(s, k);
+		
+		if (this.protocal == PROTOCAL.NOPROTOCAL) {
+			return true;
+		} else if (this.protocal == PROTOCAL.T2) {
+			return sa.T2(in, out);
+		} else if (this.protocal == PROTOCAL.T3) {
+			return sa.T2(in, out);
+		} else if (this.protocal == PROTOCAL.T4) {
+			return sa.T2(in, out);
+		} else if (this.protocal == PROTOCAL.T5) {
+			return sa.T2(in, out);
+		}
+		return false;
+	}
+	
 	@Override
 	public void render(float delta) {
 		//Clear the screen
