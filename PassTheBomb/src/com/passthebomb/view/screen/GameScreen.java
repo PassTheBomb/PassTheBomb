@@ -1,6 +1,9 @@
 package com.passthebomb.view.screen;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 import com.badlogic.gdx.Gdx;
@@ -25,7 +28,6 @@ import com.passthebomb.controller.ScreenManager;
 import com.passthebomb.model.local.Opponent;
 import com.passthebomb.model.local.Player;
 import com.passthebomb.model.local.Screen;
-import com.passthebomb.security.MsgHandler;
 import com.passthebomb.view.gui.Background;
 
 /**
@@ -61,6 +63,7 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 	private Stage stage;
 
 	Socket hostSocket;
+	private PrintWriter outputToHost;
 	private WaitScreen lastScreen;
 
 	private int id; // Player id.
@@ -70,8 +73,6 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 
 	private Listener runnableListener;
 	private Thread listener;
-	
-	private OutputStream out = null;
 	
 	private float resizeFactor;
 	
@@ -97,14 +98,14 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 		try {
 			// Set up connections and stream to update server.
 			hostSocket = this.lastScreen.getSocket();
-			out = hostSocket.getOutputStream();
+			outputToHost = new PrintWriter(hostSocket.getOutputStream(), true);
 		} catch (Exception e) {
 			System.err
 					.println("Connection Error. Cannot establish server updater.");
 			returnMain();
 		}
 		// Set up Listener thread to constantly listen for server broadcasts.
-		runnableListener = new Listener(this.lastScreen.getSocket(), this);
+		runnableListener = new Listener(this.lastScreen.getSocket(), this, outputToHost);
 		listener = new Thread(runnableListener);
 		listener.start();
 
@@ -247,18 +248,9 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 		}
 
 		// Transmit player data to server
-		String msg = id + "," + player.getAbsPos().x + ","
+		outputToHost.println(id + "," + player.getAbsPos().x + ","
 				+ player.getAbsPos().y + "," + collidedTarget + ","
-				+ player.getBombState();
-		try {
-			out.write(MsgHandler.createNetworkMsg(msg.getBytes("UTF8")));
-			out.flush();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			System.err.println("Couldn't send data to server");
-			e.printStackTrace();
-		}
+				+ player.getBombState());
 
 	}
 
@@ -304,6 +296,7 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 		// Close i/o streams and sockets when disposed.
 		try {
 			runnableListener.getInputFromHost().close();
+			outputToHost.close();
 			if (!hostSocket.isClosed()) {
 				hostSocket.close();
 			}
@@ -348,9 +341,8 @@ class Listener implements Runnable {
 	private BufferedReader inputFromHost;
 	private String input;
 	private String[] passedInfo;
+	private PrintWriter outputToHost;
 	private Socket socket;
-	private InputStream in;
-	private OutputStream out;
 
 	private volatile static int whoAmI = -1;
 	private volatile static Vector3[] positionList = new Vector3[PLAYER_LIMIT];
@@ -369,16 +361,11 @@ class Listener implements Runnable {
 	 *            The main game thread the Listener runs from. Used to
 	 *            synchronize initial data setup
 	 */
-	public Listener(Socket socket, GameScreen mainThread) {
+	public Listener(Socket socket, GameScreen mainThread, PrintWriter outputToHost) {
 		this.socket = socket;
 		this.mainThread = mainThread;
 		this.active = true;
-		try {
-			this.in = socket.getInputStream();
-			this.out = socket.getOutputStream();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		this.outputToHost = outputToHost;
 	}
 
 	public BufferedReader getInputFromHost() {
@@ -393,12 +380,8 @@ class Listener implements Runnable {
 					socket.getInputStream()));
 
 			// Acquire initial setup data
-			//outputToHost.println("ready");
-			out.write(MsgHandler.createNetworkMsg(new String("ready").getBytes()));
-			out.flush();
-
-			//input = inputFromHost.readLine();
-			input = new String(MsgHandler.acquireNetworkMsg(in), "UTF8");
+			outputToHost.println("ready");
+			input = inputFromHost.readLine();
 			passedInfo = input.split(";");
 			try {
 				whoAmI = Integer.parseInt(passedInfo[0]);
@@ -437,8 +420,8 @@ class Listener implements Runnable {
 		// Switch to broadcast listening loop
 		while (active) {
 			try {
-				if (in.available() > 0) {
-					input = new String(MsgHandler.acquireNetworkMsg(in), "UTF8");
+				if (inputFromHost.ready()) {
+					input = inputFromHost.readLine();
 					if (input.equals("quit")) {
 						System.err.println("Server terminated");
 						mainThread.returnMain();
