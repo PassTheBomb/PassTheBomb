@@ -38,6 +38,16 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 	private float resizeFactor;
 	private ProtocalScreen lastScreen;
 	private PROTOCAL protocal;
+	private Security s;
+	private Keys k;
+	
+	public Security getS() {
+		return s;
+	}
+
+	public Keys getK() {
+		return k;
+	}
 	
 	protected PROTOCAL getProtocal() {
 		return protocal;
@@ -84,8 +94,8 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 	}
 	
 	private boolean verificaiton() throws IOException {
-		Security s = new Security();
-		Keys k = new Keys();
+		s = new Security();
+		k = new Keys();
 		k.generateRSAKeyPair();
 		
 		InputStream in = this.socket.getInputStream();

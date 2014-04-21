@@ -2,9 +2,16 @@ package com.passthebomb.view.screen;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.security.InvalidKeyException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -29,6 +36,9 @@ import com.passthebomb.model.local.Opponent;
 import com.passthebomb.model.local.PROTOCAL;
 import com.passthebomb.model.local.Player;
 import com.passthebomb.model.local.Screen;
+import com.passthebomb.security.Keys;
+import com.passthebomb.security.MsgHandler;
+import com.passthebomb.security.Security;
 import com.passthebomb.view.gui.Background;
 
 /**
@@ -66,6 +76,10 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 	Socket hostSocket;
 	private PrintWriter outputToHost;
 	private WaitScreen lastScreen;
+	//private InputStream in;
+	private OutputStream out;
+	private Security security;
+	private Keys keys;
 
 	private int id; // Player id.
 	private Vector3[] posList;
@@ -77,7 +91,10 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 	
 	private float resizeFactor;
 	
-	
+	protected WaitScreen getLastScreen() {
+		return lastScreen;
+	}
+
 	public boolean isAmIWin() {
 		return amIWin;
 	}
@@ -96,10 +113,15 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 	 */
 	public GameScreen(com.badlogic.gdx.Screen lastScreen) {
 		this.lastScreen = (WaitScreen) lastScreen;
+		security = this.lastScreen.getS();
+		keys = this.lastScreen.getK();
+		
 		try {
 			// Set up connections and stream to update server.
 			hostSocket = this.lastScreen.getSocket();
 			outputToHost = new PrintWriter(hostSocket.getOutputStream(), true);
+			//in = hostSocket.getInputStream();
+			out = hostSocket.getOutputStream();
 		} catch (Exception e) {
 			System.err
 					.println("Connection Error. Cannot establish server updater.");
@@ -257,7 +279,28 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 		outputToHost.println(id + "," + player.getAbsPos().x + ","
 				+ player.getAbsPos().y + "," + collidedTarget + ","
 				+ player.getBombState());
-
+		//TODO encrypt the message then transmit
+		String msg = id + "," + player.getAbsPos().x + ","
+				+ player.getAbsPos().y + "," + collidedTarget + ","
+				+ player.getBombState();
+		try {
+			out.write(security.encrypt(msg.getBytes(), keys.getDESKey(), "DES"));
+		} catch (InvalidKeyException e) {
+			returnMain();
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			returnMain();
+			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			returnMain();
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			returnMain();
+			e.printStackTrace();
+		} catch (IOException e) {
+			returnMain();
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -529,9 +572,9 @@ class SecureListener extends Listener {
 	private final static int PLAYER_LIMIT = 4;
 
 	private BufferedReader inputFromHost;
-	private String input;
+	//private PrintWriter outputToHost;
+	//private String input;
 	private String[] passedInfo;
-	private PrintWriter outputToHost;
 	private Socket socket;
 
 	private volatile static int whoAmI = -1;
@@ -541,6 +584,11 @@ class SecureListener extends Listener {
 	private GameScreen mainThread;
 
 	private boolean active;
+	
+	private Security security;
+	private Keys keys;
+	private OutputStream out;
+	private InputStream in;
 
 	/**
 	 * Creates a Listener.
@@ -555,7 +603,17 @@ class SecureListener extends Listener {
 		this.socket = socket;
 		this.mainThread = mainThread;
 		this.active = true;
-		this.outputToHost = outputToHost;
+		//this.outputToHost = outputToHost;
+		this.security = mainThread.getLastScreen().getS();
+		this.keys = mainThread.getLastScreen().getK();
+		try {
+			this.out = socket.getOutputStream();
+			this.in = socket.getInputStream();
+		} catch (IOException e) {
+			mainThread.returnMain();
+			e.printStackTrace();
+		}
+		
 	}
 
 	public BufferedReader getInputFromHost() {
@@ -570,8 +628,46 @@ class SecureListener extends Listener {
 					socket.getInputStream()));
 
 			// Acquire initial setup data
-			outputToHost.println("ready");
-			input = inputFromHost.readLine();
+			//TODO Encrypt
+			//outputToHost.println("ready");
+			String msg = "ready";
+			try {
+				out.write(security.encrypt(msg.getBytes(), keys.getDESKey(), "DES"));
+			} catch (InvalidKeyException e) {
+				mainThread.returnMain();
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				mainThread.returnMain();
+				e.printStackTrace();
+			} catch (IllegalBlockSizeException e) {
+				mainThread.returnMain();
+				e.printStackTrace();
+			} catch (BadPaddingException e) {
+				mainThread.returnMain();
+				e.printStackTrace();
+			} catch (IOException e) {
+				mainThread.returnMain();
+				e.printStackTrace();
+			}
+			
+			//input = inputFromHost.readLine();
+			String input = null;
+			try {
+				input = new String(security.decrypt(MsgHandler.acquireNetworkMsg(in), keys.getDESKey(), "DES"));
+			} catch (InvalidKeyException e) {
+				mainThread.returnMain();
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				mainThread.returnMain();
+				e.printStackTrace();
+			} catch (IllegalBlockSizeException e) {
+				mainThread.returnMain();
+				e.printStackTrace();
+			} catch (BadPaddingException e) {
+				mainThread.returnMain();
+				e.printStackTrace();
+			}
+			//TODO Decrypt
 			passedInfo = input.split(";");
 			try {
 				whoAmI = Integer.parseInt(passedInfo[0]);
@@ -587,8 +683,7 @@ class SecureListener extends Listener {
 							.parseBoolean(currentPlayerInfo[3]);
 				}
 			} catch (Exception e) {
-				System.err
-						.println("Server input format mismatch. Unable to initialize game.");
+				System.err.println("Server input format mismatch. Unable to initialize game.");
 				mainThread.returnMain();
 				active = false;
 			}
@@ -601,8 +696,7 @@ class SecureListener extends Listener {
 			}
 
 		} catch (IOException e) {
-			System.err
-					.println("Connection Error. Failed to acquire initialization data from server due to Listener fault");
+			System.err.println("Connection Error. Failed to acquire initialization data from server due to Listener fault");
 			mainThread.returnMain();
 			active = false;
 		}
@@ -610,8 +704,29 @@ class SecureListener extends Listener {
 		// Switch to broadcast listening loop
 		while (active) {
 			try {
-				if (inputFromHost.ready()) {
-					input = inputFromHost.readLine();
+				//TODO .avaliable
+				//if (inputFromHost.ready()) {
+				if (in.available() > 0) {
+					//TODO Byte read
+					//input = inputFromHost.readLine();
+					
+					String input = null;
+					try {
+						input = new String(security.decrypt(MsgHandler.acquireNetworkMsg(in), keys.getDESKey(), "DES"));
+					} catch (InvalidKeyException e) {
+						mainThread.returnMain();
+						e.printStackTrace();
+					} catch (IllegalArgumentException e) {
+						mainThread.returnMain();
+						e.printStackTrace();
+					} catch (IllegalBlockSizeException e) {
+						mainThread.returnMain();
+						e.printStackTrace();
+					} catch (BadPaddingException e) {
+						mainThread.returnMain();
+						e.printStackTrace();
+					}
+					
 					if (input.equals("quit")) {
 						System.err.println("Server terminated");
 						mainThread.returnMain();
