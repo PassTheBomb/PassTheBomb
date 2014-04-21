@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.passthebomb.controller.ScreenManager;
 import com.passthebomb.model.local.Opponent;
+import com.passthebomb.model.local.PROTOCAL;
 import com.passthebomb.model.local.Player;
 import com.passthebomb.model.local.Screen;
 import com.passthebomb.view.gui.Background;
@@ -105,7 +106,12 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 			returnMain();
 		}
 		// Set up Listener thread to constantly listen for server broadcasts.
-		runnableListener = new Listener(this.lastScreen.getSocket(), this, outputToHost);
+		if (this.lastScreen.getProtocal() == PROTOCAL.NOPROTOCAL || this.lastScreen.getProtocal() == PROTOCAL.T2) {
+			runnableListener = new UnSecureListener(this.lastScreen.getSocket(), this, outputToHost);
+		} else {
+			runnableListener = new SecureListener(this.hostSocket, this, outputToHost);
+		}
+		//runnableListener = new Listener(this.lastScreen.getSocket(), this, outputToHost);
 		listener = new Thread(runnableListener);
 		listener.start();
 
@@ -331,11 +337,35 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 
 }
 
+class Listener implements Runnable{
+
+	@Override
+	public void run() {
+	}
+
+	public int getWhoAmI() {
+		return 0;
+	}
+
+	public boolean[] getBombList() {
+		return null;
+	}
+
+	public Vector3[] getPositionList() {
+		return null;
+	}
+
+	public BufferedReader getInputFromHost() {
+		return null;
+	}
+	
+}
+
 /**
  * A Runnable that listens on the server game data broadcasts.
  * 
  */
-class Listener implements Runnable {
+class UnSecureListener extends Listener{
 	private final static int PLAYER_LIMIT = 4;
 
 	private BufferedReader inputFromHost;
@@ -361,7 +391,7 @@ class Listener implements Runnable {
 	 *            The main game thread the Listener runs from. Used to
 	 *            synchronize initial data setup
 	 */
-	public Listener(Socket socket, GameScreen mainThread, PrintWriter outputToHost) {
+	public UnSecureListener(Socket socket, GameScreen mainThread, PrintWriter outputToHost) {
 		this.socket = socket;
 		this.mainThread = mainThread;
 		this.active = true;
@@ -494,3 +524,164 @@ class Listener implements Runnable {
 	}
 
 }
+
+class SecureListener extends Listener {
+	private final static int PLAYER_LIMIT = 4;
+
+	private BufferedReader inputFromHost;
+	private String input;
+	private String[] passedInfo;
+	private PrintWriter outputToHost;
+	private Socket socket;
+
+	private volatile static int whoAmI = -1;
+	private volatile static Vector3[] positionList = new Vector3[PLAYER_LIMIT];
+	private volatile static boolean[] bombList = new boolean[PLAYER_LIMIT];
+
+	private GameScreen mainThread;
+
+	private boolean active;
+
+	/**
+	 * Creates a Listener.
+	 * 
+	 * @param socket
+	 *            The socket that will be listened to.
+	 * @param mainThread
+	 *            The main game thread the Listener runs from. Used to
+	 *            synchronize initial data setup
+	 */
+	public SecureListener(Socket socket, GameScreen mainThread, PrintWriter outputToHost) {
+		this.socket = socket;
+		this.mainThread = mainThread;
+		this.active = true;
+		this.outputToHost = outputToHost;
+	}
+
+	public BufferedReader getInputFromHost() {
+		return inputFromHost;
+	}
+
+	@Override
+	public void run() {
+		try {
+			// Establish i/o stream
+			inputFromHost = new BufferedReader(new InputStreamReader(
+					socket.getInputStream()));
+
+			// Acquire initial setup data
+			outputToHost.println("ready");
+			input = inputFromHost.readLine();
+			passedInfo = input.split(";");
+			try {
+				whoAmI = Integer.parseInt(passedInfo[0]);
+				String[] currentPlayerInfo;
+				int player, x, y;
+				for (int i = 1; i < passedInfo.length; i++) {
+					currentPlayerInfo = passedInfo[i].split(",");
+					player = Integer.parseInt(currentPlayerInfo[0]);
+					x = Integer.parseInt(currentPlayerInfo[1]);
+					y = Integer.parseInt(currentPlayerInfo[2]);
+					positionList[player] = new Vector3(x, y, 0);
+					bombList[player] = Boolean
+							.parseBoolean(currentPlayerInfo[3]);
+				}
+			} catch (Exception e) {
+				System.err
+						.println("Server input format mismatch. Unable to initialize game.");
+				mainThread.returnMain();
+				active = false;
+			}
+
+			synchronized (mainThread) {
+				// Notify main game thread that the initial data has been
+				// acquired, so that the main game thread will pull the initial
+				// data
+				mainThread.notify();
+			}
+
+		} catch (IOException e) {
+			System.err
+					.println("Connection Error. Failed to acquire initialization data from server due to Listener fault");
+			mainThread.returnMain();
+			active = false;
+		}
+
+		// Switch to broadcast listening loop
+		while (active) {
+			try {
+				if (inputFromHost.ready()) {
+					input = inputFromHost.readLine();
+					if (input.equals("quit")) {
+						System.err.println("Server terminated");
+						mainThread.returnMain();
+						active = false;
+						socket.close();
+					} else if (input.equals("Exploded")) {
+						
+						System.out.println("Exploded");
+						
+						// If I have bomb, I lose the game
+						boolean doIHaveBomb = bombList[whoAmI];
+						
+						// Change screen to credit screen to see who wins / lose. 
+						GameScreen.setAmIWin(!doIHaveBomb);
+						//ScreenManager.getInstance().show(Screen.CREDITS, this.mainThread);
+						mainThread.goToCredit();
+						active = false;
+						
+					} else {
+						passedInfo = input.split(",");
+						try {
+							int player = Integer.parseInt(passedInfo[0]);
+							float x = Float.parseFloat(passedInfo[1]);
+							float y = Float.parseFloat(passedInfo[2]);
+							positionList[player] = new Vector3(x, y, 0);
+							bombList[player] = Boolean
+									.parseBoolean(passedInfo[3]);
+						} catch (Exception e) {
+							System.err.println("Server input format mismatch.");
+						}
+					}
+				}
+			} catch (IOException e) {
+				if (socket.isClosed()) {
+					System.err.println("Socket is Closed");
+				}
+				System.err.println("Connection Error");
+				mainThread.returnMain();
+				active = false;
+			}
+		}
+
+	}
+
+	/**
+	 * Acquires the player id
+	 * 
+	 * @return player id
+	 */
+	public int getWhoAmI() {
+		return whoAmI;
+	}
+
+	/**
+	 * Acquires the position data for all players
+	 * 
+	 * @return list of position data in player id order
+	 */
+	public Vector3[] getPositionList() {
+		return positionList;
+	}
+
+	/**
+	 * Acquires the bomb status data for all players
+	 * 
+	 * @return list of bomb status data in player id order
+	 */
+	public boolean[] getBombList() {
+		return bombList;
+	}
+
+}
+

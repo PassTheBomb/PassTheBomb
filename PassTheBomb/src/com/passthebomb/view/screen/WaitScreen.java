@@ -23,7 +23,7 @@ import com.passthebomb.security.Security;
 
 public class WaitScreen implements com.badlogic.gdx.Screen{
 
-	final String HOST = "172.16.31.45";
+	final String HOST = "192.168.81.2";
 	final int PORT = 5432;
 	
 	private final float TITLE_WIDTH = 256;
@@ -39,9 +39,14 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 	private ProtocalScreen lastScreen;
 	private PROTOCAL protocal;
 	
+	protected PROTOCAL getProtocal() {
+		return protocal;
+	}
+
 	public WaitScreen(com.badlogic.gdx.Screen lastScreen) {
 		this.lastScreen = (ProtocalScreen)lastScreen;
 		this.protocal =	this.lastScreen.chosedProtocal;
+		System.out.println(this.protocal.name());
 		batch = new SpriteBatch();    
         font = new BitmapFont();
         font.setColor(Color.RED);
@@ -49,14 +54,15 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
         this.startSession();
         try {
         	boolean result = this.verificaiton();
+        	System.out.println("Verification return"+result);
         	if (!result) {
         		System.out.println("Verification failed");
 				this.socket.close();
-				this.returnMain();
+				ScreenManager.getInstance().show(Screen.MAIN_MENU, WaitScreen.this);
 			}
 		} catch (IOException e) {
 			System.err.println("Can not get input and output stream");
-			this.returnMain();
+			ScreenManager.getInstance().show(Screen.MAIN_MENU, WaitScreen.this);
 		}
         System.out.println("Verification passed");
         this.titleTexture = new Texture(Gdx.files.internal("title.png"));
@@ -88,16 +94,17 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 		ClientAuthentication sa = new ClientAuthentication(s, k);
 		
 		if (this.protocal == PROTOCAL.NOPROTOCAL) {
-			return true;
+			return sa.NOPROTOCOL(in, out);
 		} else if (this.protocal == PROTOCAL.T2) {
 			return sa.T2(in, out);
 		} else if (this.protocal == PROTOCAL.T3) {
-			return sa.T2(in, out);
+			return sa.T3(in, out);
 		} else if (this.protocal == PROTOCAL.T4) {
-			return sa.T2(in, out);
+			return sa.T4(in, out);
 		} else if (this.protocal == PROTOCAL.T5) {
-			return sa.T2(in, out);
+			return sa.T5(in, out);
 		}
+		
 		return false;
 	}
 	
