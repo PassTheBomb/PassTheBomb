@@ -19,7 +19,6 @@ import com.passthebomb.model.local.PROTOCAL;
 import com.passthebomb.model.local.Screen;
 import com.passthebomb.security.ClientAuthentication;
 import com.passthebomb.security.Keys;
-import com.passthebomb.security.MsgHandler;
 import com.passthebomb.security.Security;
 
 public class WaitScreen implements com.badlogic.gdx.Screen{
@@ -34,13 +33,13 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 	private Texture titleTexture;
 	private BitmapFont font;
 	private Socket socket;
+	private BufferedReader inChannel;
 	private int numOfPlayerJoined;
 	private float resizeFactor;
 	private ProtocalScreen lastScreen;
 	private PROTOCAL protocal;
 	
 	public WaitScreen(com.badlogic.gdx.Screen lastScreen) {
-		System.out.println("WaitScreen");
 		this.lastScreen = (ProtocalScreen)lastScreen;
 		this.protocal =	this.lastScreen.chosedProtocal;
 		batch = new SpriteBatch();    
@@ -48,7 +47,6 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
         font.setColor(Color.RED);
         numOfPlayerJoined = 1;
         this.startSession();
-        System.out.println("Session started");
         try {
         	boolean result = this.verificaiton();
         	if (!result) {
@@ -67,15 +65,15 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 	
 	private void startSession() {
 		try {
-			System.out.println("Connecting");
 			this.socket = new Socket(HOST, PORT);
+			inChannel = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		} catch (UnknownHostException e) {
 			System.err.println("Cannot Find Server");
-			this.returnMain();
+			returnMain();
 			
 		} catch (IOException e) {
 			System.err.println("Cannot Establish Connection");
-			this.returnMain();
+			returnMain();
 		}
 	}
 	
@@ -112,7 +110,7 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
         batch.begin();
 		
 		try {
-			String in = MsgHandler.acquireNetworkMsg(this.socket.getInputStream()).toString();
+			String in = inChannel.readLine();
 			numOfPlayerJoined = Integer.parseInt(in);
 		} catch (IOException e) {
 			System.err.println("Connection Error");
@@ -169,7 +167,11 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 	}
 	
 	public void returnMain(){
-		ScreenManager.getInstance().show(Screen.MAIN_MENU, this);
+		Gdx.app.postRunnable(new Runnable() {
+	         public void run() {
+	        	 ScreenManager.getInstance().show(Screen.MAIN_MENU, WaitScreen.this);
+	         }
+		});
 	}
 
 }
