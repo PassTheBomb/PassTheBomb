@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.passthebomb.controller.ScreenManager;
 import com.passthebomb.model.local.Screen;
@@ -27,6 +28,7 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 	private Stage stage;
 	private TextButton btnJoin;
 	private TextButton btnExit;
+	private TextField textField;
 	private float resizeFactor;
 	public String str = "Main";
 	
@@ -47,22 +49,28 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 	    resizeFactor = Gdx.graphics.getWidth()/800;
 		
 		this.btnJoin = new TextButton(JOIN, skin);
-		this.btnJoin.setBounds(resizeFactor*250, resizeFactor*190, resizeFactor*300, resizeFactor*60);
+		this.btnJoin.setBounds(resizeFactor*250, resizeFactor*100, resizeFactor*300, resizeFactor*60);
 		this.btnJoin.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
+				
 				ScreenManager.getInstance().show(Screen.PROTOCAL, MainMenuScreen.this);
 			}
 		});
 		this.stage.addActor(this.btnJoin);
 		
 		this.btnExit = new TextButton(EXIT, skin);
-		this.btnExit.setBounds(resizeFactor*250, resizeFactor*100, resizeFactor*300, resizeFactor*60);
+		this.btnExit.setBounds(resizeFactor*250, resizeFactor*20, resizeFactor*300, resizeFactor*60);
 		this.btnExit.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				Gdx.app.exit();
 			}
 		});
+		
 		this.stage.addActor(this.btnExit);
+		this.textField = new TextField("", skin);
+		this.textField.setBounds(resizeFactor*250, resizeFactor*190, resizeFactor*300, resizeFactor*60);
+		this.textField.setMessageText("Input host IP");
+		this.stage.addActor(textField);
 	}
 	
 	@Override
@@ -109,6 +117,10 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 	@Override
 	public void dispose() {
 		batch.dispose();	
+	}
+	
+	public String getIP(){
+		return textField.getText();
 	}
 
 }

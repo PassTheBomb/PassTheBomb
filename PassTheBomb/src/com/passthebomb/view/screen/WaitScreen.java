@@ -23,12 +23,12 @@ import com.passthebomb.security.Security;
 
 public class WaitScreen implements com.badlogic.gdx.Screen{
 
-	final String HOST = "192.168.81.2";
 	final int PORT = 5432;
 	
 	private final float TITLE_WIDTH = 256;
 	private final float TITLE_HEIGHT = 64;
 	
+	private String HOST;
 	private SpriteBatch batch = null;
 	private Texture titleTexture;
 	private BitmapFont font;
@@ -56,7 +56,8 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 	public WaitScreen(com.badlogic.gdx.Screen lastScreen) {
 		this.lastScreen = (ProtocalScreen)lastScreen;
 		this.protocal =	this.lastScreen.chosedProtocal;
-		System.out.println(this.protocal.name());
+		this.HOST = this.lastScreen.ip;
+		System.out.println(HOST);
 		batch = new SpriteBatch();    
         font = new BitmapFont();
         font.setColor(Color.RED);

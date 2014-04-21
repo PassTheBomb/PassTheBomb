@@ -21,10 +21,13 @@ public class ProtocalScreen implements com.badlogic.gdx.Screen{
 	private TextButton btnT5;
 	public String str = "Lobby";
 	public PROTOCAL chosedProtocal;
+	public String ip;
 	
 	private float resizeFactor;
 	
 	public ProtocalScreen(com.badlogic.gdx.Screen lastScreen) {
+		ip = ((MainMenuScreen)lastScreen).getIP();
+		
 		this.stage = new Stage();
 		Gdx.input.setInputProcessor(stage);
 		
