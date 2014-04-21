@@ -30,9 +30,9 @@ public class ClientAuthentication {
 		OutputStream out = client.getOutputStream();
 
 		ClientAuthentication sa = new ClientAuthentication(s, k);
-		System.out.println(sa.T2(in, out));		
+		System.out.println(sa.T4(in, out));		
 
-		System.out.println(sa.T3(in, out));
+		/*System.out.println(sa.T3(in, out));
 		out.write(MsgHandler.createNetworkMsg(s.encrypt("testing1".getBytes(),
 				k.getDESKey(), "DES")));
 		out.flush();
@@ -45,7 +45,7 @@ public class ClientAuthentication {
 		System.out.println(sa.T5(in, out));
 		out.write(MsgHandler.createNetworkMsg(s.encrypt("testing3".getBytes(),
 				k.getDESKey(), "DES")));
-		out.flush();
+		out.flush();*/
 
 		client.close();
 	}

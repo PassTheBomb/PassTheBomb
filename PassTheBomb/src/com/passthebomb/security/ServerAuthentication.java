@@ -38,7 +38,7 @@ public class ServerAuthentication {
 		ServerAuthentication sa = new ServerAuthentication(s, k);
 		System.out.println(sa.T2(in, out));
 		
-		System.out.println(sa.T3(in, out));
+		/*System.out.println(sa.T3(in, out));
 		System.out.println((new String(s.decrypt(
 				MsgHandler.acquireNetworkMsg(in), k.getDESKey(), "DES"),
 				"UTF-8")).contentEquals("testing1"));
@@ -51,7 +51,7 @@ public class ServerAuthentication {
 		System.out.println(sa.T5(in, out));
 		System.out.println((new String(s.decrypt(
 				MsgHandler.acquireNetworkMsg(in), k.getDESKey(), "DES"),
-				"UTF-8")).contentEquals("testing3"));
+				"UTF-8")).contentEquals("testing3"));*/
 		ssock.close();
 	}
 
