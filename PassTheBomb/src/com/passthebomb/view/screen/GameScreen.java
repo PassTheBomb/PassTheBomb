@@ -276,31 +276,36 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 		}
 
 		// Transmit player data to server
-		outputToHost.println(id + "," + player.getAbsPos().x + ","
-				+ player.getAbsPos().y + "," + collidedTarget + ","
-				+ player.getBombState());
-		//TODO encrypt the message then transmit
-		String msg = id + "," + player.getAbsPos().x + ","
-				+ player.getAbsPos().y + "," + collidedTarget + ","
-				+ player.getBombState();
-		try {
-			out.write(security.encrypt(msg.getBytes(), keys.getDESKey(), "DES"));
-		} catch (InvalidKeyException e) {
-			returnMain();
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			returnMain();
-			e.printStackTrace();
-		} catch (IllegalBlockSizeException e) {
-			returnMain();
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-			returnMain();
-			e.printStackTrace();
-		} catch (IOException e) {
-			returnMain();
-			e.printStackTrace();
+		if (this.lastScreen.getProtocal() == PROTOCAL.NOPROTOCAL || this.lastScreen.getProtocal() == PROTOCAL.T2) {
+			outputToHost.println(id + "," + player.getAbsPos().x + ","
+					+ player.getAbsPos().y + "," + collidedTarget + ","
+					+ player.getBombState());
 		}
+		else {
+			//TODO encrypt the message then transmit
+			String msg = id + "," + player.getAbsPos().x + ","
+					+ player.getAbsPos().y + "," + collidedTarget + ","
+					+ player.getBombState();
+			try {
+				out.write(security.encrypt(msg.getBytes(), keys.getDESKey(), "DES"));
+			} catch (InvalidKeyException e) {
+				returnMain();
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				returnMain();
+				e.printStackTrace();
+			} catch (IllegalBlockSizeException e) {
+				returnMain();
+				e.printStackTrace();
+			} catch (BadPaddingException e) {
+				returnMain();
+				e.printStackTrace();
+			} catch (IOException e) {
+				returnMain();
+				e.printStackTrace();
+			}
+		}
+			
 	}
 
 	@Override

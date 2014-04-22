@@ -35,12 +35,16 @@ public class ScreenManager {
 		this.game = game;
 	}
 	
+	public Game getGame() {
+		return this.game;
+	}
+	
 	/**
 	 * This function is called when the screen changes
 	 * @param screen
 	 */
 	public void show(Screen screen, com.badlogic.gdx.Screen lastScreen) {
-		if(game == null) return;
+		//if(game == null) return;
 		if(!screens.containsKey(screen.ordinal())) {
 			screens.put(screen.ordinal(), screen.getScreenInstance(lastScreen));
 		}

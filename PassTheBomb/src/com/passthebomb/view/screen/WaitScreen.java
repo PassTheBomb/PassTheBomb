@@ -14,7 +14,9 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Timer;
 import com.passthebomb.controller.ScreenManager;
+import com.passthebomb.controller.ScreenSwitchTask;
 import com.passthebomb.model.local.PROTOCAL;
 import com.passthebomb.model.local.Screen;
 import com.passthebomb.security.ClientAuthentication;
@@ -57,47 +59,55 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 		this.lastScreen = (ProtocalScreen)lastScreen;
 		this.protocal =	this.lastScreen.chosedProtocal;
 		this.HOST = this.lastScreen.ip;
-		System.out.println(HOST);
 		batch = new SpriteBatch();    
         font = new BitmapFont();
         font.setColor(Color.RED);
         numOfPlayerJoined = 1;
-        this.startSession();
-        try {
-        	boolean result = this.verificaiton();
-        	System.out.println("Verification return"+result);
-        	if (!result) {
-        		System.out.println("Verification failed");
-				this.socket.close();
-				ScreenManager.getInstance().show(Screen.MAIN_MENU, WaitScreen.this);
-			}
-		} catch (IOException e) {
-			System.err.println("Can not get input and output stream");
-			ScreenManager.getInstance().show(Screen.MAIN_MENU, WaitScreen.this);
+        
+        if(this.startSession()) {
+        	try {
+            	boolean result = this.verificaiton();
+            	System.out.println("Verification return "+result);
+            	if (!result) {
+            		System.out.println("Verification failed");
+            		returnMain();
+    			} else {
+    				System.out.println("Verification passed");
+    			}
+    		} catch (IOException e) {
+    			System.err.println("Can not get input and output stream");
+    			returnMain();
+    		}
+        } else {
+			returnMain();
 		}
-        System.out.println("Verification passed");
+        
+        
+        
+        
         this.titleTexture = new Texture(Gdx.files.internal("title.png"));
         resizeFactor = Gdx.graphics.getWidth()/800;
     }
 	
-	private void startSession() {
+	private boolean startSession() {
 		try {
 			this.socket = new Socket(HOST, PORT);
 			inChannel = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		} catch (UnknownHostException e) {
 			System.err.println("Cannot Find Server");
-			returnMain();
-			
+			return false;
 		} catch (IOException e) {
 			System.err.println("Cannot Establish Connection");
-			returnMain();
+			return false;
 		}
+		return true;
 	}
 	
 	private boolean verificaiton() throws IOException {
 		s = new Security();
 		k = new Keys();
 		k.generateRSAKeyPair();
+		k.generateDESKey();
 		
 		InputStream in = this.socket.getInputStream();
 		OutputStream out = this.socket.getOutputStream();
@@ -130,7 +140,7 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 		try {
 			String in = inChannel.readLine();
 			numOfPlayerJoined = Integer.parseInt(in);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			System.err.println("Connection Error");
 			returnMain();
 		}
@@ -141,6 +151,7 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 		font.draw(batch, printString, 250, 250);
 		
 		batch.end();
+		
 		if(numOfPlayerJoined == 4) {
 			ScreenManager.getInstance().show(Screen.GAME, this);
 		}
@@ -165,7 +176,7 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 
 	@Override
 	public void hide() {
-		ScreenManager.getInstance().dispose(Screen.WAIT);
+		//ScreenManager.getInstance().dispose(Screen.WAIT);
 	}
 
 	@Override
@@ -180,16 +191,19 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 
 	@Override
 	public void dispose() {
+		try {
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		batch.dispose();
 		font.dispose();
 	}
 	
 	public void returnMain(){
-		Gdx.app.postRunnable(new Runnable() {
-	         public void run() {
-	        	 ScreenManager.getInstance().show(Screen.MAIN_MENU, WaitScreen.this);
-	         }
-		});
+		System.out.println("Returning to main");
+	    //ScreenManager.getInstance().show(Screen.MAIN_MENU, this);	
+		ScreenManager.getInstance().getGame().setScreen(Screen.MAIN_MENU.getScreenInstance(this));
 	}
 
 }

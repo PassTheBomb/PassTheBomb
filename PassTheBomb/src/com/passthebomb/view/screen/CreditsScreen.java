@@ -59,7 +59,7 @@ public class CreditsScreen implements com.badlogic.gdx.Screen{
 		}
 		
 		this.btnExit = new TextButton(buttonString, skin);
-		this.btnExit.setBounds(resizeFactor*350, resizeFactor*100, resizeFactor*300, resizeFactor*60);
+		this.btnExit.setBounds(resizeFactor*250, resizeFactor*100, resizeFactor*300, resizeFactor*60);
 		this.btnExit.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				ScreenManager.getInstance().show(Screen.MAIN_MENU, CreditsScreen.this);
