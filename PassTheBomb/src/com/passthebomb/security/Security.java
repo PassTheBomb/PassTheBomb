@@ -71,7 +71,7 @@ public class Security {
 	 *             if data + padding is longer than the available block size for
 	 *             encryption
 	 */
-	public byte[] encrypt(byte[] plaintext, Key k, String format)
+	public synchronized byte[] encrypt(byte[] plaintext, Key k, String format)
 			throws IllegalArgumentException, InvalidKeyException,
 			IllegalBlockSizeException, BadPaddingException {
 		byte[] ciphertext = null;
@@ -117,7 +117,7 @@ public class Security {
 	 *             if data + padding is longer than the available block size for
 	 *             encryption
 	 */
-	public byte[] decrypt(byte[] ciphertext, Key k, String format)
+	public synchronized byte[] decrypt(byte[] ciphertext, Key k, String format)
 			throws IllegalArgumentException, InvalidKeyException,
 			IllegalBlockSizeException, BadPaddingException {
 		byte[] plaintext = null;
