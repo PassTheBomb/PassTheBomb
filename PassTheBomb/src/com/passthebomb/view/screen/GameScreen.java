@@ -286,8 +286,11 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 			String msg = id + "," + player.getAbsPos().x + ","
 					+ player.getAbsPos().y + "," + collidedTarget + ","
 					+ player.getBombState();
+			System.out.println(msg);
+			System.out.println(msg.getBytes().length);
 			try {
-				out.write(security.encrypt(msg.getBytes(), keys.getDESKey(), "DES"));
+				out.write(MsgHandler.createNetworkMsg(security.encrypt(msg.getBytes(), keys.getDESKey(), "DES")));
+				out.flush();
 			} catch (InvalidKeyException e) {
 				returnMain();
 				e.printStackTrace();
@@ -295,14 +298,14 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 				returnMain();
 				e.printStackTrace();
 			} catch (IllegalBlockSizeException e) {
-				returnMain();
-				e.printStackTrace();
+				//returnMain();
+				//e.printStackTrace();
 			} catch (BadPaddingException e) {
-				returnMain();
-				e.printStackTrace();
+				//returnMain();
+				//e.printStackTrace();
 			} catch (IOException e) {
-				returnMain();
-				e.printStackTrace();
+				//returnMain();
+				//e.printStackTrace();
 			}
 		}
 			
@@ -628,16 +631,13 @@ class SecureListener extends Listener {
 	@Override
 	public void run() {
 		try {
-			// Establish i/o stream
-			inputFromHost = new BufferedReader(new InputStreamReader(
-					socket.getInputStream()));
-
 			// Acquire initial setup data
-			//TODO Encrypt
-			//outputToHost.println("ready");
+			//TODO
 			String msg = "ready";
 			try {
-				out.write(security.encrypt(msg.getBytes(), keys.getDESKey(), "DES"));
+				byte[] debug = security.encrypt(msg.getBytes(), keys.getDESKey(), "DES");
+				out.write(MsgHandler.createNetworkMsg(debug));
+				out.flush();
 			} catch (InvalidKeyException e) {
 				mainThread.returnMain();
 				e.printStackTrace();
@@ -655,9 +655,9 @@ class SecureListener extends Listener {
 				e.printStackTrace();
 			}
 			
-			//input = inputFromHost.readLine();
 			String input = null;
 			try {
+				//TODO
 				input = new String(security.decrypt(MsgHandler.acquireNetworkMsg(in), keys.getDESKey(), "DES"));
 			} catch (InvalidKeyException e) {
 				mainThread.returnMain();
@@ -672,7 +672,7 @@ class SecureListener extends Listener {
 				mainThread.returnMain();
 				e.printStackTrace();
 			}
-			//TODO Decrypt
+			//TODO
 			passedInfo = input.split(";");
 			try {
 				whoAmI = Integer.parseInt(passedInfo[0]);
@@ -709,15 +709,12 @@ class SecureListener extends Listener {
 		// Switch to broadcast listening loop
 		while (active) {
 			try {
-				//TODO .avaliable
-				//if (inputFromHost.ready()) {
 				if (in.available() > 0) {
-					//TODO Byte read
-					//input = inputFromHost.readLine();
-					
+					//TODO
 					String input = null;
 					try {
-						input = new String(security.decrypt(MsgHandler.acquireNetworkMsg(in), keys.getDESKey(), "DES"));
+						input = new String(security.decrypt(MsgHandler.acquireNetworkMsg(in), keys.getDESKey(), "DES"), "UTF-8");
+						System.out.println(input);
 					} catch (InvalidKeyException e) {
 						mainThread.returnMain();
 						e.printStackTrace();
@@ -746,7 +743,6 @@ class SecureListener extends Listener {
 						
 						// Change screen to credit screen to see who wins / lose. 
 						GameScreen.setAmIWin(!doIHaveBomb);
-						//ScreenManager.getInstance().show(Screen.CREDITS, this.mainThread);
 						mainThread.goToCredit();
 						active = false;
 						
