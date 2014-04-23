@@ -49,7 +49,7 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 	    resizeFactor = Gdx.graphics.getWidth()/800;
 		
 		this.btnJoin = new TextButton(JOIN, skin);
-		this.btnJoin.setBounds(resizeFactor*250, resizeFactor*100, resizeFactor*300, resizeFactor*60);
+		this.btnJoin.setBounds(resizeFactor*250, resizeFactor*120, resizeFactor*300, resizeFactor*60);
 		this.btnJoin.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				
@@ -59,16 +59,16 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 		this.stage.addActor(this.btnJoin);
 		
 		this.btnExit = new TextButton(EXIT, skin);
-		this.btnExit.setBounds(resizeFactor*250, resizeFactor*20, resizeFactor*300, resizeFactor*60);
+		this.btnExit.setBounds(resizeFactor*250, resizeFactor*40, resizeFactor*300, resizeFactor*60);
 		this.btnExit.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				Gdx.app.exit();
 			}
 		});
-		
 		this.stage.addActor(this.btnExit);
+		
 		this.textField = new TextField("", skin);
-		this.textField.setBounds(resizeFactor*250, resizeFactor*190, resizeFactor*300, resizeFactor*60);
+		this.textField.setBounds(resizeFactor*250, resizeFactor*340, resizeFactor*300, resizeFactor*60);
 		this.textField.setMessageText("Input host IP");
 		this.stage.addActor(textField);
 	}
@@ -79,7 +79,7 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		batch.begin();
-		batch.draw(titleTexture, resizeFactor*(400-TITLE_WIDTH/2), resizeFactor*320, TITLE_WIDTH, TITLE_HEIGHT);
+		batch.draw(titleTexture, resizeFactor*(400-TITLE_WIDTH/2), resizeFactor*220, TITLE_WIDTH, TITLE_HEIGHT);
 		batch.end();
 		
 		stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
