@@ -120,7 +120,6 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 			// Set up connections and stream to update server.
 			hostSocket = this.lastScreen.getSocket();
 			outputToHost = new PrintWriter(hostSocket.getOutputStream(), true);
-			//in = hostSocket.getInputStream();
 			out = hostSocket.getOutputStream();
 		} catch (Exception e) {
 			System.err
@@ -283,11 +282,9 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 		}
 		else {
 			//TODO encrypt the message then transmit
-			String msg = id + "," + player.getAbsPos().x + ","
-					+ player.getAbsPos().y + "," + collidedTarget + ","
+			String msg = id + "," + (float) Math.round(player.getAbsPos().x) + ","
+					+ (float) Math.round(player.getAbsPos().y) + "," + collidedTarget + ","
 					+ player.getBombState();
-			System.out.println(msg);
-			System.out.println(msg.getBytes().length);
 			try {
 				out.write(MsgHandler.createNetworkMsg(security.encrypt(msg.getBytes(), keys.getDESKey(), "DES")));
 				out.flush();
@@ -298,14 +295,14 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 				returnMain();
 				e.printStackTrace();
 			} catch (IllegalBlockSizeException e) {
-				//returnMain();
-				//e.printStackTrace();
+				returnMain();
+				e.printStackTrace();
 			} catch (BadPaddingException e) {
-				//returnMain();
-				//e.printStackTrace();
+				returnMain();
+				e.printStackTrace();
 			} catch (IOException e) {
-				//returnMain();
-				//e.printStackTrace();
+				returnMain();
+				e.printStackTrace();
 			}
 		}
 			
@@ -352,7 +349,6 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 
 		// Close i/o streams and sockets when disposed.
 		try {
-			runnableListener.getInputFromHost().close();
 			outputToHost.close();
 			if (!hostSocket.isClosed()) {
 				hostSocket.close();
@@ -579,9 +575,6 @@ class UnSecureListener extends Listener{
 class SecureListener extends Listener {
 	private final static int PLAYER_LIMIT = 4;
 
-	private BufferedReader inputFromHost;
-	//private PrintWriter outputToHost;
-	//private String input;
 	private String[] passedInfo;
 	private Socket socket;
 
@@ -611,7 +604,6 @@ class SecureListener extends Listener {
 		this.socket = socket;
 		this.mainThread = mainThread;
 		this.active = true;
-		//this.outputToHost = outputToHost;
 		this.security = mainThread.getLastScreen().getS();
 		this.keys = mainThread.getLastScreen().getK();
 		try {
@@ -622,10 +614,6 @@ class SecureListener extends Listener {
 			e.printStackTrace();
 		}
 		
-	}
-
-	public BufferedReader getInputFromHost() {
-		return inputFromHost;
 	}
 
 	@Override
@@ -672,7 +660,7 @@ class SecureListener extends Listener {
 				mainThread.returnMain();
 				e.printStackTrace();
 			}
-			//TODO
+
 			passedInfo = input.split(";");
 			try {
 				whoAmI = Integer.parseInt(passedInfo[0]);
@@ -709,56 +697,56 @@ class SecureListener extends Listener {
 		// Switch to broadcast listening loop
 		while (active) {
 			try {
-				if (in.available() > 0) {
+				//if (in.available() > 0) {
 					//TODO
-					String input = null;
-					try {
-						input = new String(security.decrypt(MsgHandler.acquireNetworkMsg(in), keys.getDESKey(), "DES"), "UTF-8");
-						System.out.println(input);
-					} catch (InvalidKeyException e) {
-						mainThread.returnMain();
-						e.printStackTrace();
-					} catch (IllegalArgumentException e) {
-						mainThread.returnMain();
-						e.printStackTrace();
-					} catch (IllegalBlockSizeException e) {
-						mainThread.returnMain();
-						e.printStackTrace();
-					} catch (BadPaddingException e) {
-						mainThread.returnMain();
-						e.printStackTrace();
-					}
+				String input = null;
+				try {
+					input = new String(security.decrypt(MsgHandler.acquireNetworkMsg(in), keys.getDESKey(), "DES"), "UTF-8");
+					System.out.println(input);
+				} catch (InvalidKeyException e) {
+					mainThread.returnMain();
+					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					mainThread.returnMain();
+					e.printStackTrace();
+				} catch (IllegalBlockSizeException e) {
+					mainThread.returnMain();
+					e.printStackTrace();
+				} catch (BadPaddingException e) {
+					mainThread.returnMain();
+					e.printStackTrace();
+				}
+				
+				if (input.equals("quit")) {
+					System.err.println("Server terminated");
+					mainThread.returnMain();
+					active = false;
+					socket.close();
+				} else if (input.equals("Exploded")) {
 					
-					if (input.equals("quit")) {
-						System.err.println("Server terminated");
-						mainThread.returnMain();
-						active = false;
-						socket.close();
-					} else if (input.equals("Exploded")) {
-						
-						System.out.println("Exploded");
-						
-						// If I have bomb, I lose the game
-						boolean doIHaveBomb = bombList[whoAmI];
-						
-						// Change screen to credit screen to see who wins / lose. 
-						GameScreen.setAmIWin(!doIHaveBomb);
-						mainThread.goToCredit();
-						active = false;
-						
-					} else {
-						passedInfo = input.split(",");
-						try {
-							int player = Integer.parseInt(passedInfo[0]);
-							float x = Float.parseFloat(passedInfo[1]);
-							float y = Float.parseFloat(passedInfo[2]);
-							positionList[player] = new Vector3(x, y, 0);
-							bombList[player] = Boolean
-									.parseBoolean(passedInfo[3]);
-						} catch (Exception e) {
-							System.err.println("Server input format mismatch.");
-						}
+					System.out.println("Exploded");
+					
+					// If I have bomb, I lose the game
+					boolean doIHaveBomb = bombList[whoAmI];
+					
+					// Change screen to credit screen to see who wins / lose. 
+					GameScreen.setAmIWin(!doIHaveBomb);
+					mainThread.goToCredit();
+					active = false;
+					
+				} else {
+					passedInfo = input.split(",");
+					try {
+						int player = Integer.parseInt(passedInfo[0]);
+						float x = Float.parseFloat(passedInfo[1]);
+						float y = Float.parseFloat(passedInfo[2]);
+						positionList[player] = new Vector3(x, y, 0);
+						bombList[player] = Boolean
+								.parseBoolean(passedInfo[3]);
+					} catch (Exception e) {
+						System.err.println("Server input format mismatch.");
 					}
+					//}
 				}
 			} catch (IOException e) {
 				if (socket.isClosed()) {

@@ -105,7 +105,7 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 		s = new Security();
 		k = new Keys();
 		k.generateRSAKeyPair();
-		k.generateDESKey();
+		//k.generateDESKey();
 		
 		InputStream in = this.socket.getInputStream();
 		OutputStream out = this.socket.getOutputStream();
