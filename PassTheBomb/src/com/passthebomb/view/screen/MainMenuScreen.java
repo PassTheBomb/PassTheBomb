@@ -101,7 +101,7 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 
 	@Override
 	public void hide() {
-		//ScreenManager.getInstance().dispose(Screen.MAIN_MENU);
+		ScreenManager.getInstance().dispose(Screen.MAIN_MENU);
 	}
 
 	@Override
