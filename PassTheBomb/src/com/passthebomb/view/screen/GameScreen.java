@@ -542,6 +542,14 @@ class UnSecureListener extends Listener{
 				mainThread.returnMain();
 				active = false;
 			}
+			try {
+				inputFromHost.close();
+				outputToHost.close();
+				socket.close();
+			} catch (IOException e) {
+				System.err.println("Unable to close connections");
+				e.printStackTrace();
+			}
 		}
 
 	}
