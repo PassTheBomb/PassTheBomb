@@ -149,8 +149,11 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 
 		// Setup
 		id = runnableListener.getWhoAmI();
+		System.out.println(id);
 		posList = runnableListener.getPositionList();
+		System.out.println(posList[id]);
 		bombList = runnableListener.getBombList();
+		System.out.println(bombList[id]);
 		
 		//Setup with first line of input.
 		resizeFactor = Gdx.graphics.getWidth()/DEFAULT_SCREEN_SIZE;	

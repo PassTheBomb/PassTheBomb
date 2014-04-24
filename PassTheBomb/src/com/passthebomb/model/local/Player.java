@@ -20,7 +20,9 @@ public class Player extends Character {
 
 	private int collideCtr;
 	private int bombPassCtr;
-
+	
+	private long passTime = 0;
+	private boolean passTimeSet = false;
 	/**
 	 * Creates a player.
 	 * 
@@ -82,6 +84,16 @@ public class Player extends Character {
 				if (collideCtr > 2) {
 					collideCtr = 0;
 					collide = false;
+				}
+			}
+			if (getBombPass() && !passTimeSet){
+				passTime = System.currentTimeMillis();
+				passTimeSet = true;
+			}
+			else if (getBombPass() && passTimeSet){
+				if (System.currentTimeMillis() - passTime > 1000){
+					passTimeSet = false;
+					resetBombPass();
 				}
 			}
 			checkLimits();
