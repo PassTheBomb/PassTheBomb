@@ -374,7 +374,10 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 	 * 
 	 */
 	public void returnMain() {
+		// REMOVE IF SWITCHING BACK
 		outputToHost.println("Terminated");
+		// ----
+
 		Thread.currentThread().interrupt();
 
 		Gdx.app.postRunnable(new Runnable() {
@@ -511,48 +514,54 @@ class UnSecureListener extends Listener {
 		// Switch to broadcast listening loop
 		while (active) {
 			try {
-				input = inputFromHost.readLine();
-				System.out.println(input);
-				if(input == null){
-					System.out.println("Exploded");
-					boolean doIHaveBomb = bombList[whoAmI];
-					// Change screen to credit screen to see who wins / lose.
-					GameScreen.setAmIWin(!doIHaveBomb);
-					// ScreenManager.getInstance().show(Screen.CREDITS,
-					// this.mainThread);
-					mainThread.goToCredit();
-					active = false;
-				}
-				else if (input.equals("quit")) {
-					System.err.println("Server terminated");
-					mainThread.returnMain();
-					active = false;
-					socket.close();
-				} else if (input.contentEquals("Exploded")) {
-					System.out.println("Exploded");
+				//UNCOMMMENT IF REVERTING  if (inputFromHost.ready()) {
+					input = inputFromHost.readLine();
+					System.out.println(input);
+					
+					//REMOVE IF REVERTING
+					if (input == null) {
+						System.out.println("Exploded");
+						boolean doIHaveBomb = bombList[whoAmI];
+						// Change screen to credit screen to see who wins /
+						// lose.
+						GameScreen.setAmIWin(!doIHaveBomb);
+						// ScreenManager.getInstance().show(Screen.CREDITS,
+						// this.mainThread);
+						mainThread.goToCredit();
+						active = false;
+					//---------
+					} else if (input.equals("quit")) {
+						System.err.println("Server terminated");
+						mainThread.returnMain();
+						active = false;
+						socket.close();
+					} else if (input.contentEquals("Exploded")) {
+						System.out.println("Exploded");
 
-					// If I have bomb, I lose the game
-					boolean doIHaveBomb = bombList[whoAmI];
+						// If I have bomb, I lose the game
+						boolean doIHaveBomb = bombList[whoAmI];
 
-					// Change screen to credit screen to see who wins / lose.
-					GameScreen.setAmIWin(!doIHaveBomb);
-					// ScreenManager.getInstance().show(Screen.CREDITS,
-					// this.mainThread);
-					mainThread.goToCredit();
-					active = false;
+						// Change screen to credit screen to see who wins /
+						// lose.
+						GameScreen.setAmIWin(!doIHaveBomb);
+						// ScreenManager.getInstance().show(Screen.CREDITS,
+						// this.mainThread);
+						mainThread.goToCredit();
+						active = false;
 
-				} else {
-					passedInfo = input.split(",");
-					try {
-						int player = Integer.parseInt(passedInfo[0]);
-						float x = Float.parseFloat(passedInfo[1]);
-						float y = Float.parseFloat(passedInfo[2]);
-						positionList[player] = new Vector3(x, y, 0);
-						bombList[player] = Boolean.parseBoolean(passedInfo[3]);
-					} catch (Exception e) {
-						System.err.println("Server input format mismatch.");
-					}
-
+					} else {
+						passedInfo = input.split(",");
+						try {
+							int player = Integer.parseInt(passedInfo[0]);
+							float x = Float.parseFloat(passedInfo[1]);
+							float y = Float.parseFloat(passedInfo[2]);
+							positionList[player] = new Vector3(x, y, 0);
+							bombList[player] = Boolean
+									.parseBoolean(passedInfo[3]);
+						} catch (Exception e) {
+							System.err.println("Server input format mismatch.");
+						}
+					//UNCOMMMENT IF REVERTING  }
 				}
 			} catch (IOException e) {
 				if (socket.isClosed()) {
