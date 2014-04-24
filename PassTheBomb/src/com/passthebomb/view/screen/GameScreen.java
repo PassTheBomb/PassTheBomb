@@ -12,7 +12,6 @@ import java.security.InvalidKeyException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -47,18 +46,18 @@ import com.passthebomb.view.gui.Background;
  * 
  */
 public class GameScreen implements com.badlogic.gdx.Screen {
-	private final float[] screenSize = {1024, 1024};
+	private final float[] screenSize = { 1024, 1024 };
 	private final float PLAYER_TEXTURE_SIZE = 150f;
 	private final float JOYSTICK_TEXTURE_SIZE = 128f;
 	private final float DEFAULT_SCREEN_SIZE = 800f;
-	
+
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
 	private Vector3 touchPos;
 	private Background bg;
 	private Player player;
 	private Opponent[] oppList = new Opponent[4];
-	     
+
 	private BitmapFont font;
 	private TextBounds fontBounds;
 	private TextureAtlas imgpack;
@@ -76,7 +75,7 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 	Socket hostSocket;
 	private PrintWriter outputToHost;
 	private WaitScreen lastScreen;
-	//private InputStream in;
+	// private InputStream in;
 	private OutputStream out;
 	private Security security;
 	private Keys keys;
@@ -88,9 +87,9 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 
 	private Listener runnableListener;
 	private Thread listener;
-	
+
 	private float resizeFactor;
-	
+
 	protected WaitScreen getLastScreen() {
 		return lastScreen;
 	}
@@ -98,7 +97,7 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 	public boolean isAmIWin() {
 		return amIWin;
 	}
-	
+
 	protected static void setAmIWin(boolean amIWin) {
 		GameScreen.amIWin = amIWin;
 	}
@@ -115,7 +114,7 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 		this.lastScreen = (WaitScreen) lastScreen;
 		security = this.lastScreen.getS();
 		keys = this.lastScreen.getK();
-		
+
 		try {
 			// Set up connections and stream to update server.
 			hostSocket = this.lastScreen.getSocket();
@@ -127,12 +126,16 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 			returnMain();
 		}
 		// Set up Listener thread to constantly listen for server broadcasts.
-		if (this.lastScreen.getProtocal() == PROTOCAL.NOPROTOCAL || this.lastScreen.getProtocal() == PROTOCAL.T2) {
-			runnableListener = new UnSecureListener(this.lastScreen.getSocket(), this, outputToHost);
+		if (this.lastScreen.getProtocal() == PROTOCAL.NOPROTOCAL
+				|| this.lastScreen.getProtocal() == PROTOCAL.T2) {
+			runnableListener = new UnSecureListener(
+					this.lastScreen.getSocket(), this, outputToHost);
 		} else {
-			runnableListener = new SecureListener(this.hostSocket, this, outputToHost);
+			runnableListener = new SecureListener(this.hostSocket, this,
+					outputToHost);
 		}
-		//runnableListener = new Listener(this.lastScreen.getSocket(), this, outputToHost);
+		// runnableListener = new Listener(this.lastScreen.getSocket(), this,
+		// outputToHost);
 		listener = new Thread(runnableListener);
 		listener.start();
 
@@ -151,9 +154,9 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 		id = runnableListener.getWhoAmI();
 		posList = runnableListener.getPositionList();
 		bombList = runnableListener.getBombList();
-		
-		//Setup with first line of input.
-		resizeFactor = Gdx.graphics.getWidth()/DEFAULT_SCREEN_SIZE;	
+
+		// Setup with first line of input.
+		resizeFactor = Gdx.graphics.getWidth() / DEFAULT_SCREEN_SIZE;
 
 		batch = new SpriteBatch();
 		if (!Gdx.files.internal("background.png").exists()) {
@@ -164,7 +167,7 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 					new Texture(Gdx.files.internal("background.png")),
 					new Vector2(0, 0), screenSize);
 		}
-		if (!Gdx.files.internal("player_r_s.png").exists()){
+		if (!Gdx.files.internal("player_r_s.png").exists()) {
 			System.err.println("Cannot find img");
 		} else {
 			imgpack = new TextureAtlas(Gdx.files.internal("imgpack.txt"));
@@ -198,9 +201,11 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 		touchpadStyle.background = touchBackground;
 		touchpadStyle.knob = touchKnob;
 		touchpad = new Touchpad(10, touchpadStyle);
-		
-		touchpad.setBounds(15, 15, JOYSTICK_TEXTURE_SIZE*resizeFactor, JOYSTICK_TEXTURE_SIZE*resizeFactor);
-		stage = new Stage(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),true, batch);
+
+		touchpad.setBounds(15, 15, JOYSTICK_TEXTURE_SIZE * resizeFactor,
+				JOYSTICK_TEXTURE_SIZE * resizeFactor);
+		stage = new Stage(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),
+				true, batch);
 
 		stage.addActor(touchpad);
 		Gdx.input.setInputProcessor(stage);
@@ -236,18 +241,22 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		batch.draw(bg.getBackgroundImg(), 0, 0);
-		
+
 		if (player.isAlive()) {
 			fontBounds = font.getBounds("Player");
 			font.draw(batch, "Player", player.getAbsPos().x - fontBounds.width
 					/ 2, player.getAbsPos().y + 50);
 			batch.draw(player.getCharImg(), player.getCharImgX(),
-					player.getCharImgY(), PLAYER_TEXTURE_SIZE*resizeFactor, PLAYER_TEXTURE_SIZE*resizeFactor);
+					player.getCharImgY(), PLAYER_TEXTURE_SIZE * resizeFactor,
+					PLAYER_TEXTURE_SIZE * resizeFactor);
 		}
 
 		for (int i = 0; i < 4; i++) {
 			if (i != id && oppList[i].isAlive()) {
-				batch.draw(oppList[i].getCharImg(), oppList[i].getCharImgX(), oppList[i].getCharImgY(), PLAYER_TEXTURE_SIZE*resizeFactor, PLAYER_TEXTURE_SIZE*resizeFactor);
+				batch.draw(oppList[i].getCharImg(), oppList[i].getCharImgX(),
+						oppList[i].getCharImgY(), PLAYER_TEXTURE_SIZE
+								* resizeFactor, PLAYER_TEXTURE_SIZE
+								* resizeFactor);
 				fontBounds = font.getBounds(String.valueOf(i + 1));
 				font.draw(batch, String.valueOf(i + 1),
 						oppList[i].getAbsPos().x - fontBounds.width / 2,
@@ -275,18 +284,19 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 		}
 
 		// Transmit player data to server
-		if (this.lastScreen.getProtocal() == PROTOCAL.NOPROTOCAL || this.lastScreen.getProtocal() == PROTOCAL.T2) {
+		if (this.lastScreen.getProtocal() == PROTOCAL.NOPROTOCAL
+				|| this.lastScreen.getProtocal() == PROTOCAL.T2) {
 			outputToHost.println(id + "," + player.getAbsPos().x + ","
 					+ player.getAbsPos().y + "," + collidedTarget + ","
 					+ player.getBombState());
-		}
-		else {
-			//TODO encrypt the message then transmit
-			String msg = id + "," + (float) Math.round(player.getAbsPos().x) + ","
-					+ (float) Math.round(player.getAbsPos().y) + "," + collidedTarget + ","
-					+ player.getBombState();
+		} else {
+			// TODO encrypt the message then transmit
+			String msg = id + "," + (float) Math.round(player.getAbsPos().x)
+					+ "," + (float) Math.round(player.getAbsPos().y) + ","
+					+ collidedTarget + "," + player.getBombState();
 			try {
-				out.write(MsgHandler.createNetworkMsg(security.encrypt(msg.getBytes(), keys.getDESKey(), "DES")));
+				out.write(MsgHandler.createNetworkMsg(security.encrypt(
+						msg.getBytes(), keys.getDESKey(), "DES")));
 				out.flush();
 			} catch (InvalidKeyException e) {
 				returnMain();
@@ -305,7 +315,7 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 				e.printStackTrace();
 			}
 		}
-			
+
 	}
 
 	@Override
@@ -356,7 +366,7 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	/**
@@ -365,26 +375,29 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 	 */
 	public void returnMain() {
 		Thread.currentThread().interrupt();
-		
+
 		Gdx.app.postRunnable(new Runnable() {
-	         public void run() {
-	        	 ScreenManager.getInstance().show(Screen.MAIN_MENU, GameScreen.this);
-	         }
+			public void run() {
+				ScreenManager.getInstance().show(Screen.MAIN_MENU,
+						GameScreen.this);
+			}
 		});
 	}
-	
+
 	public void goToCredit() {
+		outputToHost.println("Terminated");
 		Gdx.app.postRunnable(new Runnable() {
-	         public void run() {
-	        	 ScreenManager.getInstance().show(Screen.CREDITS, GameScreen.this);
-	         }
+			public void run() {
+				ScreenManager.getInstance().show(Screen.CREDITS,
+						GameScreen.this);
+			}
 		});
-		
+
 	}
 
 }
 
-class Listener implements Runnable{
+class Listener implements Runnable {
 
 	@Override
 	public void run() {
@@ -405,14 +418,14 @@ class Listener implements Runnable{
 	public BufferedReader getInputFromHost() {
 		return null;
 	}
-	
+
 }
 
 /**
  * A Runnable that listens on the server game data broadcasts.
  * 
  */
-class UnSecureListener extends Listener{
+class UnSecureListener extends Listener {
 	private final static int PLAYER_LIMIT = 4;
 
 	private BufferedReader inputFromHost;
@@ -438,7 +451,8 @@ class UnSecureListener extends Listener{
 	 *            The main game thread the Listener runs from. Used to
 	 *            synchronize initial data setup
 	 */
-	public UnSecureListener(Socket socket, GameScreen mainThread, PrintWriter outputToHost) {
+	public UnSecureListener(Socket socket, GameScreen mainThread,
+			PrintWriter outputToHost) {
 		this.socket = socket;
 		this.mainThread = mainThread;
 		this.active = true;
@@ -497,38 +511,40 @@ class UnSecureListener extends Listener{
 		// Switch to broadcast listening loop
 		while (active) {
 			try {
-				if (inputFromHost.ready()) {
-					input = inputFromHost.readLine();
-					if (input.equals("quit")) {
-						System.err.println("Server terminated");
-						mainThread.returnMain();
-						active = false;
-						socket.close();
-					} else if (input.equals("Exploded")) {
-						
-						
-						// If I have bomb, I lose the game
-						boolean doIHaveBomb = bombList[whoAmI];
-						
-						// Change screen to credit screen to see who wins / lose. 
-						GameScreen.setAmIWin(!doIHaveBomb);
-						//ScreenManager.getInstance().show(Screen.CREDITS, this.mainThread);
-						mainThread.goToCredit();
-						active = false;
-						
-					} else {
-						passedInfo = input.split(",");
-						try {
-							int player = Integer.parseInt(passedInfo[0]);
-							float x = Float.parseFloat(passedInfo[1]);
-							float y = Float.parseFloat(passedInfo[2]);
-							positionList[player] = new Vector3(x, y, 0);
-							bombList[player] = Boolean
-									.parseBoolean(passedInfo[3]);
-						} catch (Exception e) {
-							System.err.println("Server input format mismatch.");
-						}
+				input = inputFromHost.readLine();
+				if (input.equals("quit")) {
+					System.err.println("Server terminated");
+					mainThread.returnMain();
+					active = false;
+					socket.close();
+				} else if (input.contentEquals("Exploded")) {
+
+					// If I have bomb, I lose the game
+					boolean doIHaveBomb = bombList[whoAmI];
+
+					// Change screen to credit screen to see who wins / lose.
+					GameScreen.setAmIWin(!doIHaveBomb);
+					// ScreenManager.getInstance().show(Screen.CREDITS,
+					// this.mainThread);
+					mainThread.goToCredit();
+					active = false;
+
+				} 
+				else if (input == null){
+					
+				}
+				else {
+					passedInfo = input.split(",");
+					try {
+						int player = Integer.parseInt(passedInfo[0]);
+						float x = Float.parseFloat(passedInfo[1]);
+						float y = Float.parseFloat(passedInfo[2]);
+						positionList[player] = new Vector3(x, y, 0);
+						bombList[player] = Boolean.parseBoolean(passedInfo[3]);
+					} catch (Exception e) {
+						System.err.println("Server input format mismatch.");
 					}
+
 				}
 			} catch (IOException e) {
 				if (socket.isClosed()) {
@@ -538,7 +554,7 @@ class UnSecureListener extends Listener{
 				mainThread.returnMain();
 				active = false;
 			}
-			
+
 		}
 		try {
 			inputFromHost.close();
@@ -593,7 +609,7 @@ class SecureListener extends Listener {
 	private GameScreen mainThread;
 
 	private boolean active;
-	
+
 	private Security security;
 	private Keys keys;
 	private OutputStream out;
@@ -608,7 +624,8 @@ class SecureListener extends Listener {
 	 *            The main game thread the Listener runs from. Used to
 	 *            synchronize initial data setup
 	 */
-	public SecureListener(Socket socket, GameScreen mainThread, PrintWriter outputToHost) {
+	public SecureListener(Socket socket, GameScreen mainThread,
+			PrintWriter outputToHost) {
 		this.socket = socket;
 		this.mainThread = mainThread;
 		this.active = true;
@@ -621,17 +638,18 @@ class SecureListener extends Listener {
 			mainThread.returnMain();
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	@Override
 	public void run() {
 		try {
 			// Acquire initial setup data
-			//TODO
+			// TODO
 			String msg = "ready";
 			try {
-				byte[] debug = security.encrypt(msg.getBytes(), keys.getDESKey(), "DES");
+				byte[] debug = security.encrypt(msg.getBytes(),
+						keys.getDESKey(), "DES");
 				out.write(MsgHandler.createNetworkMsg(debug));
 				out.flush();
 			} catch (InvalidKeyException e) {
@@ -650,11 +668,13 @@ class SecureListener extends Listener {
 				mainThread.returnMain();
 				e.printStackTrace();
 			}
-			
+
 			String input = null;
 			try {
-				//TODO
-				input = new String(security.decrypt(MsgHandler.acquireNetworkMsg(in), keys.getDESKey(), "DES"));
+				// TODO
+				input = new String(security.decrypt(
+						MsgHandler.acquireNetworkMsg(in), keys.getDESKey(),
+						"DES"));
 			} catch (InvalidKeyException e) {
 				mainThread.returnMain();
 				e.printStackTrace();
@@ -684,7 +704,8 @@ class SecureListener extends Listener {
 							.parseBoolean(currentPlayerInfo[3]);
 				}
 			} catch (Exception e) {
-				System.err.println("Server input format mismatch. Unable to initialize game.");
+				System.err
+						.println("Server input format mismatch. Unable to initialize game.");
 				mainThread.returnMain();
 				active = false;
 			}
@@ -697,7 +718,8 @@ class SecureListener extends Listener {
 			}
 
 		} catch (IOException e) {
-			System.err.println("Connection Error. Failed to acquire initialization data from server due to Listener fault");
+			System.err
+					.println("Connection Error. Failed to acquire initialization data from server due to Listener fault");
 			mainThread.returnMain();
 			active = false;
 		}
@@ -705,11 +727,13 @@ class SecureListener extends Listener {
 		// Switch to broadcast listening loop
 		while (active) {
 			try {
-				//if (in.available() > 0) {
-					//TODO
+				// if (in.available() > 0) {
+				// TODO
 				String input = null;
 				try {
-					input = new String(security.decrypt(MsgHandler.acquireNetworkMsg(in), keys.getDESKey(), "DES"), "UTF-8");
+					input = new String(security.decrypt(
+							MsgHandler.acquireNetworkMsg(in), keys.getDESKey(),
+							"DES"), "UTF-8");
 				} catch (InvalidKeyException e) {
 					mainThread.returnMain();
 					e.printStackTrace();
@@ -723,23 +747,22 @@ class SecureListener extends Listener {
 					mainThread.returnMain();
 					e.printStackTrace();
 				}
-				
+
 				if (input.equals("quit")) {
 					System.err.println("Server terminated");
 					mainThread.returnMain();
 					active = false;
 					socket.close();
 				} else if (input.equals("Exploded")) {
-					
-					
+
 					// If I have bomb, I lose the game
 					boolean doIHaveBomb = bombList[whoAmI];
-					
-					// Change screen to credit screen to see who wins / lose. 
+
+					// Change screen to credit screen to see who wins / lose.
 					GameScreen.setAmIWin(!doIHaveBomb);
 					mainThread.goToCredit();
 					active = false;
-					
+
 				} else {
 					passedInfo = input.split(",");
 					try {
@@ -747,12 +770,11 @@ class SecureListener extends Listener {
 						float x = Float.parseFloat(passedInfo[1]);
 						float y = Float.parseFloat(passedInfo[2]);
 						positionList[player] = new Vector3(x, y, 0);
-						bombList[player] = Boolean
-								.parseBoolean(passedInfo[3]);
+						bombList[player] = Boolean.parseBoolean(passedInfo[3]);
 					} catch (Exception e) {
 						System.err.println("Server input format mismatch.");
 					}
-					//}
+					// }
 				}
 			} catch (IOException e) {
 				if (socket.isClosed()) {
@@ -794,4 +816,3 @@ class SecureListener extends Listener {
 	}
 
 }
-
