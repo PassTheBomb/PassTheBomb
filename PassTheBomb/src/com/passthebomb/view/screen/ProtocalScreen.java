@@ -36,7 +36,7 @@ public class ProtocalScreen implements com.badlogic.gdx.Screen{
 		resizeFactor = Gdx.graphics.getWidth()/800;
 		
 		this.btnServer = new TextButton("No Protocal", skin);
-		this.btnServer.setBounds(resizeFactor*250, resizeFactor*390, resizeFactor*300, resizeFactor*60);
+		this.btnServer.setBounds((Gdx.graphics.getWidth()-resizeFactor*300)/2, resizeFactor*390, resizeFactor*300, resizeFactor*60);
 		this.btnServer.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				chosedProtocal = PROTOCAL.NOPROTOCAL;
@@ -46,7 +46,7 @@ public class ProtocalScreen implements com.badlogic.gdx.Screen{
 		this.stage.addActor(this.btnServer);
 		
 		this.btnT2 = new TextButton("T2", skin);
-		this.btnT2.setBounds(resizeFactor*250, resizeFactor*300, resizeFactor*300, resizeFactor*60);
+		this.btnT2.setBounds((Gdx.graphics.getWidth()-resizeFactor*300)/2, resizeFactor*300, resizeFactor*300, resizeFactor*60);
 		this.btnT2.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				chosedProtocal = PROTOCAL.T2;
@@ -56,7 +56,7 @@ public class ProtocalScreen implements com.badlogic.gdx.Screen{
 		this.stage.addActor(this.btnT2);
 		
 		this.btnT3 = new TextButton("T3", skin);
-		this.btnT3.setBounds(resizeFactor*250, resizeFactor*210, resizeFactor*300, resizeFactor*60);
+		this.btnT3.setBounds((Gdx.graphics.getWidth()-resizeFactor*300)/2, resizeFactor*210, resizeFactor*300, resizeFactor*60);
 		this.btnT3.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				chosedProtocal = PROTOCAL.T3;
@@ -66,7 +66,7 @@ public class ProtocalScreen implements com.badlogic.gdx.Screen{
 		this.stage.addActor(this.btnT3);
 		
 		this.btnT4 = new TextButton("T4", skin);
-		this.btnT4.setBounds(resizeFactor*250, resizeFactor*120, resizeFactor*300, resizeFactor*60);
+		this.btnT4.setBounds((Gdx.graphics.getWidth()-resizeFactor*300)/2, resizeFactor*120, resizeFactor*300, resizeFactor*60);
 		this.btnT4.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				chosedProtocal = PROTOCAL.T4;
@@ -76,7 +76,7 @@ public class ProtocalScreen implements com.badlogic.gdx.Screen{
 		this.stage.addActor(this.btnT4);
 		
 		this.btnT5 = new TextButton("T5", skin);
-		this.btnT5.setBounds(resizeFactor*250, resizeFactor*30, resizeFactor*300, resizeFactor*60);
+		this.btnT5.setBounds((Gdx.graphics.getWidth()-resizeFactor*300)/2, resizeFactor*30, resizeFactor*300, resizeFactor*60);
 		this.btnT5.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				chosedProtocal = PROTOCAL.T5;

@@ -30,6 +30,8 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 	private TextButton btnExit;
 	private TextField textField;
 	private float resizeFactor;
+	private float resizeHightFactor;
+	
 	public String str = "Main";
 	
 	/**
@@ -47,9 +49,10 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 		Skin skin = new Skin(Gdx.files.internal("data/ui/uiskin.json"));
 	  
 	    resizeFactor = Gdx.graphics.getWidth()/800;
+	    resizeHightFactor = Gdx.graphics.getHeight()/480;
 		
 		this.btnJoin = new TextButton(JOIN, skin);
-		this.btnJoin.setBounds(resizeFactor*250, resizeFactor*120, resizeFactor*300, resizeFactor*60);
+		this.btnJoin.setBounds((Gdx.graphics.getWidth()-resizeFactor*300)/2, resizeHightFactor*120, resizeFactor*300, resizeFactor*60);
 		this.btnJoin.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				
@@ -59,7 +62,7 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 		this.stage.addActor(this.btnJoin);
 		
 		this.btnExit = new TextButton(EXIT, skin);
-		this.btnExit.setBounds(resizeFactor*250, resizeFactor*40, resizeFactor*300, resizeFactor*60);
+		this.btnExit.setBounds((Gdx.graphics.getWidth()-resizeFactor*300)/2, resizeHightFactor*40, resizeFactor*300, resizeFactor*60);
 		this.btnExit.addListener(new ClickListener() {
 			public void touchUp(InputEvent e, float x, float y, int point, int button) {
 				Gdx.app.exit();
@@ -68,7 +71,7 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 		this.stage.addActor(this.btnExit);
 		
 		this.textField = new TextField("", skin);
-		this.textField.setBounds(resizeFactor*250, resizeFactor*340, resizeFactor*300, resizeFactor*60);
+		this.textField.setBounds((Gdx.graphics.getWidth()-resizeFactor*300)/2, resizeHightFactor*340, resizeFactor*300, resizeFactor*60);
 		this.textField.setMessageText("Input host IP");
 		this.stage.addActor(textField);
 	}
@@ -79,7 +82,7 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		batch.begin();
-		batch.draw(titleTexture, resizeFactor*(400-TITLE_WIDTH/2), resizeFactor*220, TITLE_WIDTH, TITLE_HEIGHT);
+		batch.draw(titleTexture, (Gdx.graphics.getWidth()-resizeFactor*TITLE_WIDTH)/2, resizeHightFactor*220, resizeFactor*TITLE_WIDTH, resizeFactor*TITLE_HEIGHT);
 		batch.end();
 		
 		stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
@@ -104,7 +107,7 @@ public class MainMenuScreen implements com.badlogic.gdx.Screen{
 
 	@Override
 	public void pause() {
-		
+		this.dispose();
 	}
 
 	@Override

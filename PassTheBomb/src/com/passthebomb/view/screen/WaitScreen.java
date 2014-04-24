@@ -145,8 +145,8 @@ public class WaitScreen implements com.badlogic.gdx.Screen{
 		
 		String printString = "Number of player joined: " + numOfPlayerJoined;
 		
-		batch.draw(titleTexture, resizeFactor*(400-TITLE_WIDTH/2), resizeFactor*320, TITLE_WIDTH, TITLE_HEIGHT);
-		font.draw(batch, printString, 250, 250);
+		batch.draw(titleTexture, (Gdx.graphics.getWidth()-resizeFactor*TITLE_WIDTH)/2, resizeFactor*320, resizeFactor*TITLE_WIDTH, resizeFactor*TITLE_HEIGHT);
+		font.draw(batch, printString, (Gdx.graphics.getWidth()-resizeFactor*(font.getBounds(printString).width))/2, resizeFactor*250);
 		
 		batch.end();
 		

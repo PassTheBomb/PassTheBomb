@@ -53,6 +53,7 @@ public class IntroScreen implements com.badlogic.gdx.Screen{
 
 	@Override
 	public void pause() {
+		this.dispose();
 	}
 
 	@Override
@@ -61,7 +62,6 @@ public class IntroScreen implements com.badlogic.gdx.Screen{
 
 	@Override
 	public void dispose() {
-		//font.dispose();
 		batch.dispose();
 	}
 
