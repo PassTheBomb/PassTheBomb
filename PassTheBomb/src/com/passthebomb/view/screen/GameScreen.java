@@ -374,6 +374,7 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 	 * 
 	 */
 	public void returnMain() {
+		outputToHost.println("Terminated");
 		Thread.currentThread().interrupt();
 
 		Gdx.app.postRunnable(new Runnable() {
@@ -385,7 +386,6 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 	}
 
 	public void goToCredit() {
-		outputToHost.println("Terminated");
 		Gdx.app.postRunnable(new Runnable() {
 			public void run() {
 				ScreenManager.getInstance().show(Screen.CREDITS,
@@ -512,12 +512,24 @@ class UnSecureListener extends Listener {
 		while (active) {
 			try {
 				input = inputFromHost.readLine();
-				if (input.equals("quit")) {
+				System.out.println(input);
+				if(input == null){
+					System.out.println("Exploded");
+					boolean doIHaveBomb = bombList[whoAmI];
+					// Change screen to credit screen to see who wins / lose.
+					GameScreen.setAmIWin(!doIHaveBomb);
+					// ScreenManager.getInstance().show(Screen.CREDITS,
+					// this.mainThread);
+					mainThread.goToCredit();
+					active = false;
+				}
+				else if (input.equals("quit")) {
 					System.err.println("Server terminated");
 					mainThread.returnMain();
 					active = false;
 					socket.close();
 				} else if (input.contentEquals("Exploded")) {
+					System.out.println("Exploded");
 
 					// If I have bomb, I lose the game
 					boolean doIHaveBomb = bombList[whoAmI];
@@ -529,11 +541,7 @@ class UnSecureListener extends Listener {
 					mainThread.goToCredit();
 					active = false;
 
-				} 
-				else if (input == null){
-					
-				}
-				else {
+				} else {
 					passedInfo = input.split(",");
 					try {
 						int player = Integer.parseInt(passedInfo[0]);
@@ -564,6 +572,7 @@ class UnSecureListener extends Listener {
 			System.err.println("Unable to close connections");
 			e.printStackTrace();
 		}
+		System.out.println("Listener Ended");
 
 	}
 
