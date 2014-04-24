@@ -149,11 +149,8 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 
 		// Setup
 		id = runnableListener.getWhoAmI();
-		System.out.println(id);
 		posList = runnableListener.getPositionList();
-		System.out.println(posList[id]);
 		bombList = runnableListener.getBombList();
-		System.out.println(bombList[id]);
 		
 		//Setup with first line of input.
 		resizeFactor = Gdx.graphics.getWidth()/DEFAULT_SCREEN_SIZE;	
@@ -509,7 +506,6 @@ class UnSecureListener extends Listener{
 						socket.close();
 					} else if (input.equals("Exploded")) {
 						
-						System.out.println("Exploded");
 						
 						// If I have bomb, I lose the game
 						boolean doIHaveBomb = bombList[whoAmI];
@@ -542,14 +538,15 @@ class UnSecureListener extends Listener{
 				mainThread.returnMain();
 				active = false;
 			}
-			try {
-				inputFromHost.close();
-				outputToHost.close();
-				socket.close();
-			} catch (IOException e) {
-				System.err.println("Unable to close connections");
-				e.printStackTrace();
-			}
+			
+		}
+		try {
+			inputFromHost.close();
+			outputToHost.close();
+			socket.close();
+		} catch (IOException e) {
+			System.err.println("Unable to close connections");
+			e.printStackTrace();
 		}
 
 	}
@@ -713,7 +710,6 @@ class SecureListener extends Listener {
 				String input = null;
 				try {
 					input = new String(security.decrypt(MsgHandler.acquireNetworkMsg(in), keys.getDESKey(), "DES"), "UTF-8");
-					System.out.println(input);
 				} catch (InvalidKeyException e) {
 					mainThread.returnMain();
 					e.printStackTrace();
@@ -735,7 +731,6 @@ class SecureListener extends Listener {
 					socket.close();
 				} else if (input.equals("Exploded")) {
 					
-					System.out.println("Exploded");
 					
 					// If I have bomb, I lose the game
 					boolean doIHaveBomb = bombList[whoAmI];
