@@ -374,9 +374,6 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 	 * 
 	 */
 	public void returnMain() {
-		// REMOVE IF SWITCHING BACK
-		outputToHost.println("Terminated");
-		// ----
 
 		Thread.currentThread().interrupt();
 
@@ -389,6 +386,18 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 	}
 
 	public void goToCredit() {
+		// REMOVE IF SWITCHING BACK
+		outputToHost.println("Terminated");
+		// ----
+
+		try {
+			hostSocket.getInputStream().close();
+			outputToHost.close();
+			hostSocket.close();
+			System.out.println("SOCKET CLOSED");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		Gdx.app.postRunnable(new Runnable() {
 			public void run() {
 				ScreenManager.getInstance().show(Screen.CREDITS,
@@ -514,21 +523,24 @@ class UnSecureListener extends Listener {
 		// Switch to broadcast listening loop
 		while (active) {
 			try {
+				if (socket.isClosed()){
+
+					System.out.println("Exploded");
+					boolean doIHaveBomb = bombList[whoAmI];
+					// Change screen to credit screen to see who wins /
+					// lose.
+					GameScreen.setAmIWin(!doIHaveBomb);
+					// ScreenManager.getInstance().show(Screen.CREDITS,
+					// this.mainThread);
+					mainThread.goToCredit();
+					active = false;
+				}
 				//UNCOMMMENT IF REVERTING  if (inputFromHost.ready()) {
 					input = inputFromHost.readLine();
 					System.out.println(input);
 					
 					//REMOVE IF REVERTING
 					if (input == null) {
-						System.out.println("Exploded");
-						boolean doIHaveBomb = bombList[whoAmI];
-						// Change screen to credit screen to see who wins /
-						// lose.
-						GameScreen.setAmIWin(!doIHaveBomb);
-						// ScreenManager.getInstance().show(Screen.CREDITS,
-						// this.mainThread);
-						mainThread.goToCredit();
-						active = false;
 					//---------
 					} else if (input.equals("quit")) {
 						System.err.println("Server terminated");
