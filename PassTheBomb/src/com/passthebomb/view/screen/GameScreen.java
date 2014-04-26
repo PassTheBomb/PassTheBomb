@@ -290,7 +290,6 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 					+ player.getAbsPos().y + "," + collidedTarget + ","
 					+ player.getBombState());
 		} else {
-			// TODO encrypt the message then transmit
 			String msg = id + "," + (float) Math.round(player.getAbsPos().x)
 					+ "," + (float) Math.round(player.getAbsPos().y) + ","
 					+ collidedTarget + "," + player.getBombState();
@@ -394,7 +393,6 @@ public class GameScreen implements com.badlogic.gdx.Screen {
 			hostSocket.getInputStream().close();
 			outputToHost.close();
 			hostSocket.close();
-			System.out.println("SOCKET CLOSED");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -523,9 +521,8 @@ class UnSecureListener extends Listener {
 		// Switch to broadcast listening loop
 		while (active) {
 			try {
-				if (socket.isClosed()){
+				if (socket.isClosed()) {
 
-					System.out.println("Exploded");
 					boolean doIHaveBomb = bombList[whoAmI];
 					// Change screen to credit screen to see who wins /
 					// lose.
@@ -535,45 +532,42 @@ class UnSecureListener extends Listener {
 					mainThread.goToCredit();
 					active = false;
 				}
-				//UNCOMMMENT IF REVERTING  if (inputFromHost.ready()) {
-					input = inputFromHost.readLine();
-					System.out.println(input);
-					
-					//REMOVE IF REVERTING
-					if (input == null) {
-					//---------
-					} else if (input.equals("quit")) {
-						System.err.println("Server terminated");
-						mainThread.returnMain();
-						active = false;
-						socket.close();
-					} else if (input.contentEquals("Exploded")) {
-						System.out.println("Exploded");
+				// UNCOMMMENT IF REVERTING if (inputFromHost.ready()) {
+				input = inputFromHost.readLine();
 
-						// If I have bomb, I lose the game
-						boolean doIHaveBomb = bombList[whoAmI];
+				// REMOVE IF REVERTING
+				if (input == null) {
+					// ---------
+				} else if (input.equals("quit")) {
+					System.err.println("Server terminated");
+					mainThread.returnMain();
+					active = false;
+					socket.close();
+				} else if (input.contentEquals("Exploded")) {
 
-						// Change screen to credit screen to see who wins /
-						// lose.
-						GameScreen.setAmIWin(!doIHaveBomb);
-						// ScreenManager.getInstance().show(Screen.CREDITS,
-						// this.mainThread);
-						mainThread.goToCredit();
-						active = false;
+					// If I have bomb, I lose the game
+					boolean doIHaveBomb = bombList[whoAmI];
 
-					} else {
-						passedInfo = input.split(",");
-						try {
-							int player = Integer.parseInt(passedInfo[0]);
-							float x = Float.parseFloat(passedInfo[1]);
-							float y = Float.parseFloat(passedInfo[2]);
-							positionList[player] = new Vector3(x, y, 0);
-							bombList[player] = Boolean
-									.parseBoolean(passedInfo[3]);
-						} catch (Exception e) {
-							System.err.println("Server input format mismatch.");
-						}
-					//UNCOMMMENT IF REVERTING  }
+					// Change screen to credit screen to see who wins /
+					// lose.
+					GameScreen.setAmIWin(!doIHaveBomb);
+					// ScreenManager.getInstance().show(Screen.CREDITS,
+					// this.mainThread);
+					mainThread.goToCredit();
+					active = false;
+
+				} else {
+					passedInfo = input.split(",");
+					try {
+						int player = Integer.parseInt(passedInfo[0]);
+						float x = Float.parseFloat(passedInfo[1]);
+						float y = Float.parseFloat(passedInfo[2]);
+						positionList[player] = new Vector3(x, y, 0);
+						bombList[player] = Boolean.parseBoolean(passedInfo[3]);
+					} catch (Exception e) {
+						System.err.println("Server input format mismatch.");
+					}
+					// UNCOMMMENT IF REVERTING }
 				}
 			} catch (IOException e) {
 				if (socket.isClosed()) {
@@ -593,7 +587,6 @@ class UnSecureListener extends Listener {
 			System.err.println("Unable to close connections");
 			e.printStackTrace();
 		}
-		System.out.println("Listener Ended");
 
 	}
 
@@ -675,7 +668,6 @@ class SecureListener extends Listener {
 	public void run() {
 		try {
 			// Acquire initial setup data
-			// TODO
 			String msg = "ready";
 			try {
 				byte[] debug = security.encrypt(msg.getBytes(),
@@ -701,7 +693,6 @@ class SecureListener extends Listener {
 
 			String input = null;
 			try {
-				// TODO
 				input = new String(security.decrypt(
 						MsgHandler.acquireNetworkMsg(in), keys.getDESKey(),
 						"DES"));
@@ -757,8 +748,6 @@ class SecureListener extends Listener {
 		// Switch to broadcast listening loop
 		while (active) {
 			try {
-				// if (in.available() > 0) {
-				// TODO
 				String input = null;
 				try {
 					input = new String(security.decrypt(
